@@ -1,0 +1,18 @@
+{
+  "name": "patimokkha",
+  "description": "Bhikkhu Pāṭimokkha (Pāli–English, tr. Ṭhānissaro Bhikkhu) as Markdoc, with Pāli/English builds to Markdown, HTML, EPUB and PDF.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun src/build.ts",
+    "build:all": "bun src/build.ts all --lang both && bun src/build.ts all --lang pali && bun src/build.ts all --lang english",
+    "check": "bun src/check.ts",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@markdoc/markdoc": "^0.5.10"
+  }
+}

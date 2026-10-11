@@ -1,0 +1,75 @@
+:root {
+  --ink: #1d1b18;
+  --muted: #6b645a;
+  --accent: #8a3b12;
+  --paper: #fdfbf7;
+  --measure: 36rem;
+}
+html { background: var(--paper); color: var(--ink); }
+body {
+  font-family: "Gentium Plus", "Gentium Book Plus", "Gentium", serif;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 6rem;
+  max-width: var(--measure);
+}
+body.both { max-width: 72rem; }
+h1, h2, h3 { font-weight: normal; text-align: center; letter-spacing: 0.08em; }
+h2 { font-variant: small-caps; font-size: 1.35rem; margin-top: 3rem; }
+h3 { font-style: italic; letter-spacing: 0; font-size: 1.2rem; }
+h2 .english, h3 .english { display: block; font-size: 0.8em; color: var(--muted); }
+.title { text-align: center; margin: 3rem 0; }
+.title h1 { font-size: 2.2rem; }
+.subtitle { letter-spacing: 0.3em; }
+
+.passage { margin: 1rem 0; }
+.both .passage:has(> .pali):has(> .english) {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;
+}
+.both .english { color: #3a352f; }
+.pali p, .english p, .instruction p { margin: 0 0 0.6rem; text-indent: 1.5em; }
+.lines p, .stanza p, .numbered p, .align-center p, .note p, li p { text-indent: 0; }
+.align-center { text-align: center; }
+.lines p { margin-left: 1.5em; }
+.lines.indented p { margin-left: 3em; }
+.stanza { margin: 0 0 1rem 1.5em; }
+.indent { display: inline-block; width: 2em; }
+.numbered ol { padding-left: 1.5em; margin: 0.4rem 0; }
+.num { font-weight: bold; }
+.response, .rubric, .vagga { text-align: center; font-style: italic; margin: 1.2rem 0; }
+.vagga { font-style: normal; }
+.response .pali::before, .rubric .pali::before { content: "( "; }
+.response .pali::after, .rubric .pali::after { content: " )"; }
+.response .english::before, .rubric .english::before { content: "( "; }
+.response .english::after, .rubric .english::after { content: " )"; }
+.both .response .english, .both .rubric .english, .both .vagga .english { margin-left: 2rem; color: var(--muted); }
+span.rubric { margin: 0; }
+.call { font-style: italic; }
+.lead::before { content: "["; } .lead::after { content: "]"; }
+.changed { font-variant: small-caps; letter-spacing: 0.03em; }
+.var { font-style: italic; }
+.noteref { color: var(--accent); font-style: normal; font-size: 0.7em; }
+.sic { text-decoration: underline dotted var(--accent); }
+.instruction { font-style: italic; color: var(--muted); }
+.instruction strong { font-style: normal; color: var(--ink); }
+.passage[data-speaker]::before { content: attr(data-speaker) ":"; display: block; font-style: italic; color: var(--muted); }
+.note { margin: 1rem 0; }
+.note::before { content: attr(data-label) "."; font-weight: bold; margin-right: 0.4em; float: left; }
+.season-table ul, .numbers ul { list-style: none; padding-left: 1.5em; }
+.numbers ul { columns: 2; }
+.table-title { font-style: italic; margin-top: 1rem; }
+.epigraph { margin: 3rem auto; text-align: center; font-style: italic; }
+.epigraph .source { font-style: normal; text-align: right; }
+.colophon, .signature { margin: 2rem 0; }
+section.chapter { break-before: page; }
+section.continue { break-before: auto; }
+
+nav.toggles {
+  position: sticky; top: 0; z-index: 2; background: var(--paper);
+  display: flex; gap: 0.5rem; justify-content: center; padding: 0.5rem; border-bottom: 1px solid #e4ddd0;
+  font-size: 0.9rem;
+}
+nav.toggles label { cursor: pointer; user-select: none; }
+body.hide-pali .pali, body.hide-english .english, body.hide-english .instruction { display: none; }
+body.hide-pali .passage, body.hide-english .passage { display: block !important; }
