@@ -28,6 +28,7 @@
 
 ## Book readings marked {% sic %} (corrected unless built with --no-corrections)
 - 02-pubba-kicca-notes.md:22 printed **sattā** → suggested **satta**
+- 02-pubba-kicca-notes.md:24 printed **uposathās** → suggested **uposathas**
 - 04-parajika.md:28 printed **muḷho'si** → suggested **mūḷho'si**
 - 05-sanghadisesa.md:141 printed **chanda-gamino** → suggested **chanda-gāmino**
 - 11-adhikarana-samatha.md:19 printed **Uppannunānaṁ** → suggested **Uppannuppannānaṁ**

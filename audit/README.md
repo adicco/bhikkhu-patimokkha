@@ -28,6 +28,8 @@ the OCR.
 | Pubba-kicca | sāmaggīnam-aññataro | sāmaggīnamaññataro (the hyphen is a line break) |
 | Nidāna | evam-evaṁ | Evam-evaṁ |
 | Saṅghādisesa 3, 4 | methunūpasaṁhitāhi / -ena | methunūpasañhitāhi / -ena |
+| Saṅghādisesa 5 | itthi-matiṁ | itthī-matiṁ (found by diffing against the Sasanarakkha text) |
+| Saṅghādisesa 12 | saṁvaddhā | saṁvaḍḍhā (likewise) |
 | Saṅghādisesa (end) | cha-rattaṁ | chārattaṁ (printed `chā-` + `rattaṁ` across a line break) |
 | Aniyata 2 | nālaṁ-kammaniyaṁ | nālaṁkammaniyaṁ |
 | Nissaggiya 7 | abhihaṭṭhuṁ pavāreyya | abhihaṭṭhum-pavāreyya |
@@ -58,6 +60,7 @@ suggested reading; `bun run build -- --no-corrections` prints the book's own ins
 | Pavāraṇā pubba-kicca | suriya-lokassa | suriy'ālokassa |
 | Pavāraṇā pubba-kicca | dhāretabbam, yuttarūpam | dhāretabbaṁ, yuttarūpaṁ |
 | Notes 4 | sattā ca uposathā | satta ca uposathā |
+| Notes 4 (English) | ten uposathās | ten uposathas |
 
 Two printing slips that don't affect pronunciation were silently normalised:
 `upo-sathaṁ` (Nidāna: a stray mid-line hyphen) and the misplaced closing quote in

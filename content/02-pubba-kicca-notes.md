@@ -21,7 +21,7 @@ During the hot season, change "*hemantotu*" to "*gimhotu*." During the rainy sea
 {% note id="4" %}
 During a normal rainy season, change "*aṭṭha uposathā*" to "*{% sic correction="satta" %}sattā{% /sic %} ca uposathā ekā ca pavāraṇā*": "Seven uposathas and one pavāraṇā."
 
-During a hot or cold season with an additional month, change it to "*adhikamāsa-vasena dasa uposathā*": "Because of the additional month, ten uposathas…."
+During a hot or cold season with an additional month, change it to "*adhikamāsa-vasena dasa uposathā*": "Because of the additional month, ten {% sic correction="uposathas" %}uposathās{% /sic %}…."
 
 During a rainy season with an additional month, change it to "*adhikamāsa-vasena nava ca uposathā ekā ca pavāraṇā*": "Because of the additional month, nine uposathas and one pavāraṇā…."
 {% /note %}

@@ -52,7 +52,7 @@ Should any bhikkhu, overcome by lust, with altered mind, speak in the presence o
 
 {% rule class="sanghadisesa" n=5 %}
 {% pali %}
-Yo pana bhikkhu sañcarittaṁ samāpajjeyya, itthiyā vā purisa-matiṁ, purisassa vā itthi-matiṁ, jāyattane vā jārattane vā antamaso taṁ-khaṇikāya-pi, saṅghādiseso.
+Yo pana bhikkhu sañcarittaṁ samāpajjeyya, itthiyā vā purisa-matiṁ, purisassa vā itthī-matiṁ, jāyattane vā jārattane vā antamaso taṁ-khaṇikāya-pi, saṅghādiseso.
 {% /pali %}
 {% english %}
 Should any bhikkhu engage in conveying a man's intentions to a woman or a woman's intentions to a man, proposing marriage or paramourage—even if only for a momentary liaison—it entails initial and subsequent meetings of the Community.
@@ -123,7 +123,7 @@ And should those bhikkhus, thus admonished by the bhikkhus, persist as before, t
 
 {% rule class="sanghadisesa" n=12 %}
 {% pali %}
-Bhikkhu pan'eva dubbaca-jātiko hoti, uddesa-pariyāpannesu sikkhāpadesu bhikkhūhi saha-dhammikaṁ vuccamāno attānaṁ avacanīyaṁ karoti, "Mā maṁ āyasmanto kiñci avacuttha kalyāṇaṁ vā pāpakaṁ vā. Aham-p'āyasmante na kiñci vakkhāmi kalyāṇaṁ vā pāpakaṁ vā. Viramath'āyasmanto mama vacanāyā" ti. So bhikkhu bhikkhūhi evam-assa vacanīyo, "Mā āyasmā attānaṁ avacanīyaṁ akāsi. Vacanīyam-eva āyasmā attānaṁ karotu. Āyasmā-pi bhikkhū vadetu saha-dhammena, bhikkhū-pi āyasmantaṁ vakkhanti saha-dhammena. Evaṁ saṁvaddhā hi tassa bhagavato parisā, yad'idaṁ aññam-añña-vacanena aññam-añña-vuṭṭhāpanenā" ti.
+Bhikkhu pan'eva dubbaca-jātiko hoti, uddesa-pariyāpannesu sikkhāpadesu bhikkhūhi saha-dhammikaṁ vuccamāno attānaṁ avacanīyaṁ karoti, "Mā maṁ āyasmanto kiñci avacuttha kalyāṇaṁ vā pāpakaṁ vā. Aham-p'āyasmante na kiñci vakkhāmi kalyāṇaṁ vā pāpakaṁ vā. Viramath'āyasmanto mama vacanāyā" ti. So bhikkhu bhikkhūhi evam-assa vacanīyo, "Mā āyasmā attānaṁ avacanīyaṁ akāsi. Vacanīyam-eva āyasmā attānaṁ karotu. Āyasmā-pi bhikkhū vadetu saha-dhammena, bhikkhū-pi āyasmantaṁ vakkhanti saha-dhammena. Evaṁ saṁvaḍḍhā hi tassa bhagavato parisā, yad'idaṁ aññam-añña-vacanena aññam-añña-vuṭṭhāpanenā" ti.
 
 Evañ-ca so bhikkhu bhikkhūhi vuccamāno tath'eva paggaṇheyya, so bhikkhu bhikkhūhi yāva-tatiyaṁ samanubhāsitabbo tassa paṭinissaggāya. Yāva-tatiyañ-ce samanubhāsiyamāno taṁ paṭinissajjeyya, icc'etaṁ kusalaṁ. No ce paṭinissajjeyya, saṅghādiseso.
 {% /pali %}
