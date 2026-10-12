@@ -7,6 +7,7 @@
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { baseName } from "./artifacts";
 import { orList, parseCli, suggest, usageError } from "./cli";
 import { loadChapters, render, validate } from "./load";
 import { showFor, type Lang } from "./options";
@@ -138,9 +139,8 @@ const unknownChapters = only?.filter((slug) => !chapters.some((c) => c.slug === 
 if (unknownChapters?.length) fail(`unknown chapters: ${unknownChapters.join(", ")}\nAvailable: ${chapters.map((c) => c.slug).join(", ")}`);
 
 const rendered = render(chapters, show, occasion, only);
-const suffix = { pali: "Pali", english: "English", both: "Pali-English" }[lang];
 const title = `Bhikkhu Pāṭimokkha (${{ pali: "Pāli", english: "English", both: "Pāli–English" }[lang]})`;
-const base = `Bhikkhu-Patimokkha.${suffix}`;
+const base = baseName(lang);
 const outDir = join(values.out!, lang);
 mkdirSync(outDir, { recursive: true });
 
@@ -218,7 +218,7 @@ if (targets.has("pdf")) {
   // follows the printed book: Pāli on the left page, English on the facing right page.
 
   const layout = values.columns ? "columns" : "stacked";
-  async function typeset(paper: "a4" | "a5", layout: "stacked" | "columns" | "facing", name = `${base}.${paper.toUpperCase()}`) {
+  async function typeset(paper: "a4" | "a5", layout: "stacked" | "columns" | "facing", name = `${base}.${paper}`) {
     writeFileSync(join(outDir, `${name}.tex`), toLatex(rendered, show, { title, paper, fontSize, layout }));
     for (let i = 0; i < 2; i++) await run(lualatex(name));
     for (const ext of ["aux", "log", "out", "toc"]) rmSync(join(outDir, `${name}.${ext}`), { force: true });
@@ -228,11 +228,11 @@ if (targets.has("pdf")) {
   if (papers.has("a4")) console.log(`pdf   ${join(outDir, await typeset("a4", layout))}`);
   if (papers.has("a5")) console.log(`pdf   ${join(outDir, await typeset("a5", layout))}`);
   if (papers.has("booklet")) {
-    const a5 = await typeset("a5", "facing", `${base}.A5-facing`);
+    const a5 = await typeset("a5", "facing", `${base}.a5-facing`);
     // Saddle-stitch imposition: pages padded to a multiple of 4 and reordered so that the
     // A4 sheets, printed double-sided (flip on short edge), folded and nested, read in order.
     // --signature N splits it into folded gatherings of N pages (multiple of 4) for sewing.
-    const name = `${base}.A5-booklet`;
+    const name = `${base}.a5-booklet`;
     writeFileSync(join(outDir, `${name}.tex`), String.raw`\documentclass{article}
 \usepackage[a4paper,landscape]{geometry}
 \usepackage{pdfpages}

@@ -25,9 +25,9 @@ The `pdf` target writes three files by default:
 
 | file | |
 |---|---|
-| `….A4.pdf` | A4 pages |
-| `….A5.pdf` | A5 pages |
-| `….A5-booklet.pdf` | A5 pages imposed two-up on A4 landscape in booklet order: print double-sided, **flip on short edge**, fold the stack in half and staple or sew at the fold |
+| `….a4.pdf` | A4 pages |
+| `….a5.pdf` | A5 pages |
+| `….a5-booklet.pdf` | A5 pages imposed two-up on A4 landscape in booklet order: print double-sided, **flip on short edge**, fold the stack in half and staple or sew at the fold |
 
 In bilingual builds, the A4 and A5 PDFs put each passage's English under its Pāli in a smaller,
 grey type; `--columns` sets them side by side instead. The booklet follows the printed book: Pāli
@@ -83,7 +83,8 @@ bun run publish      # build, then publish as a GitHub release; notes from CHANG
 ```
 
 `release` builds the three languages in every format, zips the Markdown, and copies each file
-to `dist/site/files/` as `bhikkhu-patimokkha.v<version>.<languages>[.<format>].<hash>.<ext>`:
+to `dist/site/files/` under its build name (`dist/<lang>/bhikkhu-patimokkha.v<version>.<languages>[.<format>].<ext>`)
+with its hash added before the extension:
 `bhikkhu-patimokkha.v1.0.pali.eng.a4.a545767bd6.pdf`, `….pali.only.a5-booklet.….pdf`,
 `….eng.only.….epub`, `….pali.eng.md.….zip`. The version is the text's, from
 `content/edition.json`: bump it when the text changes. The hash is the file's own content hash,

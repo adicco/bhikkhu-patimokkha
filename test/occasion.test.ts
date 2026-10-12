@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { EDITION, hashedName, releaseName } from "../src/artifacts";
+import { baseName, EDITION, FORMATS, hashedName, LANGS, releaseName } from "../src/artifacts";
 import { uposathaDays } from "../src/calendar";
 import { loadChapters, render } from "../src/load";
 import { NUMBERS, occasionErrors, reading, SEASON_TABLES, SLOT_NAMES, type Occasion } from "../src/occasion";
@@ -117,8 +117,8 @@ describe("calendar", () => {
 });
 
 test("release file names carry the hash before the extension", () => {
-  expect(hashedName("/x/Bhikkhu-Patimokkha.Pali.A4.pdf", "0123456789")).toBe("Bhikkhu-Patimokkha.Pali.A4.0123456789.pdf");
-  expect(hashedName("Bhikkhu-Patimokkha.Pali.Markdown.zip", "abc")).toBe("Bhikkhu-Patimokkha.Pali.Markdown.abc.zip");
+  expect(hashedName("/x/bhikkhu-patimokkha.v1.0.pali.only.a4.pdf", "0123456789")).toBe("bhikkhu-patimokkha.v1.0.pali.only.a4.0123456789.pdf");
+  expect(hashedName("bhikkhu-patimokkha.v1.0.pali.only.md.zip", "abc")).toBe("bhikkhu-patimokkha.v1.0.pali.only.md.abc.zip");
 });
 
 test("release names carry the text's version, the languages, the format and the file's hash", () => {
@@ -130,4 +130,6 @@ test("release names carry the text's version, the languages, the format and the 
   expect(releaseName("both", "md", h, { edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.eng.md.0123456789.zip");
   expect(releaseName("pali", "a5", h, { custom: true, edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.only.custom.a5.0123456789.pdf");
   expect(releaseName("both", "html", h)).toBe(`bhikkhu-patimokkha.v${EDITION}.pali.eng.0123456789.html`);
+  // A build's own file plus the hash is the released name.
+  for (const { lang } of LANGS) for (const f of FORMATS) expect(hashedName(f.built(baseName(lang)), h)).toBe(releaseName(lang, f.kind, h));
 });

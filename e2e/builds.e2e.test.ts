@@ -4,6 +4,7 @@
  */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import type { Browser, Page } from "playwright-core";
+import { baseName } from "../src/artifacts";
 import { buildFromForm, change, launch, open, startSite, type Site } from "./harness";
 
 let site: Site;
@@ -167,7 +168,7 @@ describe("EPUB, HTML and Markdown", () => {
     await configure(page, [["#date", UPOSATHA], ["target", "md"], ["solo", "Pubba-kicca"], ["chapter", "nidana"], ["season", "gimha"], ["select[name=\"fortnight\"]", "2"]]);
     const { name, path } = await buildFromForm(page);
     expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.eng\.custom\.md\.[0-9a-f]{10}\.zip$/);
-    expect(unzipList(path)).toEqual(["Bhikkhu-Patimokkha.Pali-English.md", "md/01-pubba-kicca.md", "md/03-nidana.md"]);
+    expect(unzipList(path)).toEqual([`${baseName("both")}.md`, "md/01-pubba-kicca.md", "md/03-nidana.md"]);
     const md = sh(["unzip", "-p", path, "md/01-pubba-kicca.md"]);
     expect(md).toContain("Ayaṁ *gimhotu*.");
     expect(md).toContain("eko uposatho sampatto,\\\n*eko uposatho atikkanto,\\\ncha uposathā avasiṭṭhā*.");
