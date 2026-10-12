@@ -15,10 +15,19 @@ services:
       BUILD_CONCURRENCY: "1"   # LaTeX is CPU-bound; raise with the VPS's cores
       BUILD_QUEUE: "8"
       BUILD_TIMEOUT: "180"
+      CLIENT_IP_HEADER: cf-connecting-ip   # only reachable through the tunnel (and 127.0.0.1)
     volumes:
       - build-cache:/app/dist/cache
+    networks:
+      - default
+      - tunnel   # cloudflared from ~/Code/study.jhana.info reaches http://patimokkha:3000
     cpus: 2
     mem_limit: 2g
 
 volumes:
   build-cache:
+
+networks:
+  tunnel:
+    external: true
+    name: studyjhanainfo_default

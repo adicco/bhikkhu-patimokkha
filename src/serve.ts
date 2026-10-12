@@ -10,6 +10,11 @@
  * Environment: PORT (3000), HOST (0.0.0.0), SITE_DIR (dist/site), CACHE_DIR (dist/cache),
  * BUILD_CONCURRENCY (1), BUILD_QUEUE (8), BUILD_TIMEOUT (180 s), CACHE_ENTRIES (300).
  * Builds are cached by their options and the source text, so a repeated request is instant.
+ *
+ * Per client address, at most BUILD_PER_IP (2) builds run or wait at once, and at most BUILD_RATE_LIMIT
+ * (10; 0 turns the limit off) new builds start per BUILD_RATE_WINDOW (600 s). Cached builds don't count.
+ * Behind a proxy, CLIENT_IP_HEADER names the header with the client's address (cf-connecting-ip
+ * behind a Cloudflare tunnel); only set it when the proxy is the only way in, since clients can forge it.
  */
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
@@ -26,6 +31,10 @@ const CONCURRENCY = Number(process.env.BUILD_CONCURRENCY ?? 1);
 const QUEUE = Number(process.env.BUILD_QUEUE ?? 8);
 const TIMEOUT = Number(process.env.BUILD_TIMEOUT ?? 180) * 1000;
 const CACHE_ENTRIES = Number(process.env.CACHE_ENTRIES ?? 300);
+const PER_IP = Number(process.env.BUILD_PER_IP ?? 2);
+const RATE_LIMIT = Number(process.env.BUILD_RATE_LIMIT ?? 10);
+const RATE_WINDOW = Number(process.env.BUILD_RATE_WINDOW ?? 600) * 1000;
+const IP_HEADER = process.env.CLIENT_IP_HEADER?.toLowerCase();
 
 const SLUGS = loadChapters().map((c) => c.slug);
 
@@ -151,9 +160,37 @@ async function slot<T>(fn: () => Promise<T>): Promise<T> {
 
 class HttpError extends Error { constructor(public status: number, message: string) { super(message); } }
 
+// ---- Per-address limits on builds that have to run (not cached, not already in progress).
+
+const active = new Map<string, number>();
+const started = new Map<string, number[]>();
+
+function admit(ip: string) {
+  if ((active.get(ip) ?? 0) >= PER_IP) throw new HttpError(429, "You already have builds in progress. Wait for them to finish.");
+  const now = Date.now();
+  const recent = (started.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW);
+  if (RATE_LIMIT > 0 && recent.length >= RATE_LIMIT) {
+    const minutes = Math.ceil((recent[0] + RATE_WINDOW - now) / 60_000);
+    throw new HttpError(429, `Too many custom builds from your address. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`);
+  }
+  recent.push(now);
+  started.set(ip, recent);
+  active.set(ip, (active.get(ip) ?? 0) + 1);
+}
+
+function release(ip: string) {
+  const n = (active.get(ip) ?? 1) - 1;
+  if (n > 0) active.set(ip, n); else active.delete(ip);
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, ts] of started) if (ts.every((t) => now - t >= RATE_WINDOW)) started.delete(ip);
+}, 60_000).unref();
+
 const inflight = new Map<string, Promise<string>>();
 
-async function build(req: BuildRequest, args: string[]): Promise<string> {
+async function build(req: BuildRequest, args: string[], ip: string): Promise<string> {
   const key = new Bun.CryptoHasher("sha256").update(VERSION).update(JSON.stringify(args)).digest("hex").slice(0, 24);
   const dir = join(CACHE, key);
   try {
@@ -161,7 +198,8 @@ async function build(req: BuildRequest, args: string[]): Promise<string> {
     if (file) return join(dir, file);
   } catch {}
   if (!inflight.has(key)) {
-    inflight.set(key, slot(() => run(req, args, dir)).finally(() => inflight.delete(key)));
+    admit(ip);
+    inflight.set(key, slot(() => run(req, args, dir)).finally(() => { inflight.delete(key); release(ip); }));
   }
   return inflight.get(key)!;
 }
@@ -241,7 +279,7 @@ for (const d of readdirSync(CACHE)) if (d.startsWith(".build-")) rmSync(join(CAC
 const server = Bun.serve({
   port: Number(process.env.PORT ?? 3000),
   hostname: process.env.HOST ?? "0.0.0.0",
-  async fetch(r) {
+  async fetch(r, server) {
     const { pathname } = new URL(r.url);
     try {
       if (pathname === "/api/health") return json({ ok: true, version: VERSION, running, waiting: waiting.length });
@@ -256,7 +294,8 @@ const server = Bun.serve({
       if (pathname === "/api/build" && r.method === "POST") {
         const { req, args, errors } = parse(await readBody(r));
         if (errors.length || !req) return json({ error: errors.join("; ") }, 400);
-        const path = await build(req, args);
+        const ip = (IP_HEADER && r.headers.get(IP_HEADER)?.split(",")[0].trim()) || server.requestIP(r)?.address || "unknown";
+        const path = await build(req, args, ip);
         const name = path.split(sep).pop()!;
         return new Response(Bun.file(path), {
           headers: { "content-type": type(name), "content-disposition": `attachment; filename="${name}"`, "cache-control": "no-store" },
@@ -267,7 +306,11 @@ const server = Bun.serve({
       if (r.method !== "GET" && r.method !== "HEAD") return new Response("Method not allowed", { status: 405 });
       return await staticFile(pathname);
     } catch (e) {
-      if (e instanceof HttpError) return json({ error: e.message }, e.status);
+      if (e instanceof HttpError) {
+        const res = json({ error: e.message }, e.status);
+        if (e.status === 429 || e.status === 503) res.headers.set("retry-after", "60");
+        return res;
+      }
       console.error(e);
       return json({ error: "Something went wrong on the server." }, 500);
     }
