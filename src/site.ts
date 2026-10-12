@@ -85,12 +85,11 @@ ${LANGS.map((l) => `    <tr><th scope="row">${l.label}</th>${FORMATS.map((f) => 
   const js = readFileSync(join(ASSETS, "site.js"), "utf8");
   const template = readFileSync(join(ASSETS, "site.html"), "utf8");
 
-  const released = new Date(manifest.sourceDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
   const html = template
     .replace("/*CSS*/", () => css)
     .replace("/*JS*/", () => js)
     .replace("<!--DOWNLOADS-->", () => table)
-    .replace("<!--RELEASED-->", () => `Text as of ${released}${manifest.commit ? ` (${esc(manifest.commit)})` : ""}.`)
+    .replace("<!--RELEASED-->", () => `<a href="https://github.com/adicco/bhikkhu-patimokkha/releases">Source text v${esc(manifest.edition)}</a>.`)
     .replace("<!--PREVIEW-->", () => previewHtml("uposatha", {}, "both"))
     .replace("/*DATA*/", () => JSON.stringify(data).replace(/</g, "\\u003c"));
   writeFileSync(join(out, "index.html"), html);
