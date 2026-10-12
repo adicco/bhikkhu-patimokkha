@@ -40,13 +40,25 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* Masthead: the title in the book's face, large; one sentence of what this is. */
 .masthead { margin-bottom: 3.5rem; position: relative; }
-/* Daylight or lamplight: a quiet switch in the masthead's corner. */
-button.theme {
-  position: absolute; top: -2rem; right: 0;
-  font: inherit; font-size: 0.88rem; color: var(--stylus); background: none;
-  border: 1px solid var(--rule); border-radius: 3px; padding: 0.15rem 0.6rem;
+/* Daylight or lamplight, and the source: quiet icons in the masthead's corner. */
+.corner { position: absolute; top: -2.4rem; right: 0; display: flex; gap: 0.4rem; align-items: center; }
+button.theme, a.github {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; padding: 0; color: var(--stylus); background: none;
+  border: 1px solid var(--rule); border-radius: 3px;
 }
-button.theme:hover { background: var(--leaf-lit); color: var(--ink); border-color: var(--stylus); }
+button.theme:hover, a.github:hover { background: var(--leaf-lit); color: var(--ink); border-color: var(--stylus); }
+.corner svg { width: 1.05rem; height: 1.05rem; }
+button.theme svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+a.github svg { fill: currentColor; }
+/* The icon shows where the switch leads: a moon by daylight, a sun by lamplight. */
+button.theme .sun { display: none; }
+:root[data-theme="dark"] button.theme .sun { display: block; }
+:root[data-theme="dark"] button.theme .moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) button.theme .sun { display: block; }
+  :root:not([data-theme="light"]) button.theme .moon { display: none; }
+}
 h1 {
   font-weight: normal;
   font-size: clamp(2.6rem, 7vw, 4.2rem);

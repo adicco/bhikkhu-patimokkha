@@ -13,14 +13,22 @@ const LANG_TOGGLES = `<label><input type="checkbox" checked data-hide="pali"> PÄ
 /** Top bar: PÄli/English toggles (bilingual builds) and the light/dark switch. */
 const toggles = (both: boolean) => `<nav class="toggles">
   ${both ? LANG_TOGGLES : ""}
-  <button type="button" id="theme" aria-label="Switch light/dark"></button>
+  <button type="button" id="theme" aria-label="Switch to dark" title="Switch to dark">
+    <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+    <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+  </button>
 </nav>
 <script>
 document.querySelectorAll("nav.toggles input").forEach((box) =>
   box.addEventListener("change", () => document.body.classList.toggle("hide-" + box.dataset.hide, !box.checked)));
 const root = document.documentElement, themeButton = document.getElementById("theme");
 const dark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-const label = () => { themeButton.textContent = dark() ? "Light" : "Dark"; };
+// The icon follows the theme in CSS; only the words for screen readers and tooltips change here.
+const label = () => {
+  const to = dark() ? "Switch to light" : "Switch to dark";
+  themeButton.setAttribute("aria-label", to);
+  themeButton.title = to;
+};
 themeButton.addEventListener("click", () => {
   root.dataset.theme = dark() ? "light" : "dark";
   try { localStorage.setItem("theme", root.dataset.theme); } catch {}

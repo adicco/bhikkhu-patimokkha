@@ -6,7 +6,12 @@
   const button = document.getElementById("theme");
   const system = matchMedia("(prefers-color-scheme: dark)");
   const current = () => root.dataset.theme ?? (system.matches ? "dark" : "light");
-  const label = () => { button.textContent = current() === "dark" ? "Light" : "Dark"; };
+  // The icon follows the theme in CSS; only the words for screen readers and tooltips change here.
+  const label = () => {
+    const to = current() === "dark" ? "Switch to light" : "Switch to dark";
+    button.setAttribute("aria-label", to);
+    button.title = to;
+  };
   button.addEventListener("click", () => {
     root.dataset.theme = current() === "dark" ? "light" : "dark";
     try { localStorage.setItem("theme", root.dataset.theme); } catch {}

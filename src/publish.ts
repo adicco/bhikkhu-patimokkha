@@ -10,8 +10,11 @@
  * Needs the gh CLI, logged in. The tag defaults to the text's date (v2026.10.12, then
  * v2026.10.12.2, … if that is taken). If the latest release already has exactly these files,
  * nothing is published unless --force: the hashed names change only when the text does.
+ * The release is made as a draft, the files uploaded one by one, then the draft published; each
+ * GitHub call is retried on 5xx/network errors and traced to dist/publish.log (GH_DEBUG=api,
+ * token redacted). If a run still fails, the draft stays: rerun with --skip-build to resume it.
  */
-import { readFileSync, statSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, statSync, writeFileSync, appendFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseCli } from "./cli";
@@ -36,6 +39,9 @@ Builds the release (bun run release) and publishes its files as a GitHub release
                   --notes and CHANGELOG.md's Unreleased section is empty
   --dry-run       show what would be published, and publish nothing
   -h, --help      show this help
+
+GitHub calls are retried on server/network errors and traced to dist/publish.log. A run that
+still fails leaves a draft release; rerun with --skip-build to resume it.
 `;
 const { values } = parseCli(NAME, HELP, {
   "skip-build": { type: "boolean", default: false },
@@ -97,7 +103,9 @@ const names = (paths: string[]) => paths.map((p) => p.split("/").pop()!).sort();
 // ---- The release.
 
 const repo = run(["gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"])!;
-const releases: { tagName: string; isLatest: boolean }[] = JSON.parse(run(["gh", "release", "list", "--limit", "100", "--json", "tagName,isLatest"])!);
+const releases: { tagName: string; isLatest: boolean; isDraft: boolean }[] = JSON.parse(run(["gh", "release", "list", "--limit", "100", "--json", "tagName,isLatest,isDraft"])!);
+/** Tags taken by a published release; a draft's tag is free, and its draft is resumed. */
+const taken = (tag: string) => releases.some((r) => r.tagName === tag && !r.isDraft);
 
 const latest = releases.find((r) => r.isLatest);
 if (latest && !values.force) {
@@ -129,8 +137,9 @@ if (intro) intro += "\n\n";
 
 const date = manifest.sourceDate.slice(0, 10);
 let tag = values.tag ?? `v${date.replace(/-/g, ".")}`;
-if (!values.tag) for (let n = 2; releases.some((r) => r.tagName === tag) || run(["git", "rev-parse", "-q", "--verify", `refs/tags/${tag}`], { ok: true }); n++) tag = `v${date.replace(/-/g, ".")}.${n}`;
-else if (releases.some((r) => r.tagName === tag)) fail(`a release tagged ${tag} already exists`);
+if (!values.tag) for (let n = 2; taken(tag) || run(["git", "rev-parse", "-q", "--verify", `refs/tags/${tag}`], { ok: true }); n++) tag = `v${date.replace(/-/g, ".")}.${n}`;
+else if (taken(tag)) fail(`a release tagged ${tag} already exists`);
+const resuming = releases.some((r) => r.tagName === tag && r.isDraft);
 
 const size = (bytes: number) => (bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1e3))} KB`);
 const released = new Date(manifest.sourceDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -148,7 +157,7 @@ The A5 booklet is imposed two-up on A4 landscape: print double-sided, flip on th
 SHA-256 digests are in \`manifest.json\`.
 `;
 
-console.log(`${dry ? "Would publish" : "Publishing"} ${tag} on ${head.slice(0, 7)} to ${repo}${values.draft ? " (draft)" : ""}:`);
+console.log(`${dry ? "Would publish" : "Publishing"} ${tag} on ${head.slice(0, 7)} to ${repo}${values.draft ? " (draft)" : ""}${resuming ? ", resuming its draft" : ""}:`);
 for (const n of names(assets)) console.log(`  ${n}`);
 if (dry) {
   console.log(`\n${notes}`);
@@ -160,15 +169,128 @@ if (fallback && !values.yes) {
   if (!/^y(es)?$/i.test(prompt("Publish with these notes? [y/N]")?.trim() ?? "")) fail("not published; add notes under ## Unreleased in CHANGELOG.md");
 }
 
+// ---- Upload: draft, then each file, then publish, so a failure can be retried or resumed.
+
+const LOG = join(ROOT, "dist", "publish.log");
+writeFileSync(LOG, `publish ${tag} on ${head} to ${repo}, ${new Date().toISOString()}\n`);
+const elapsed = (t0: number) => `${((performance.now() - t0) / 1000).toFixed(1)}s`;
+
+/** A failed gh call: what GitHub said, and whether trying again might help (5xx or no response). */
+class GhError extends Error {
+  constructor(message: string, readonly transient: boolean) { super(message); }
+}
+
+/** Run gh once with its API trace (GH_DEBUG=api, token redacted) appended to LOG; its stdout. */
+async function ghOnce(what: string, args: string[], attempt: number): Promise<string> {
+  const t0 = performance.now();
+  appendFileSync(LOG, `\n==== ${what}, attempt ${attempt}: gh ${args.join(" ")}\n`);
+  const p = Bun.spawn(["gh", ...args], { cwd: ROOT, env: { ...process.env, GH_DEBUG: "api" }, stdout: "pipe", stderr: "pipe" });
+  const [out, err] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text()]);
+  const code = await p.exited;
+  appendFileSync(LOG, `${err}\n==== exit ${code} after ${elapsed(t0)}\n`);
+  if (code === 0) return out.trim();
+  // gh's own message comes last, after the trace (lines starting "* ", "> ", "< ", bodies, GraphQL).
+  const status = [...err.matchAll(/^< HTTP\/[\d.]+ (\d{3}.*)$/gm)].at(-1)?.[1];
+  const id = [...err.matchAll(/^< X-Github-Request-Id: (\S+)/gim)].at(-1)?.[1];
+  const message = err.split("\n").filter((l) => /^[^\s*<>{}\[\]"]/.test(l) && !/^GraphQL |accessibility/i.test(l)).at(-1) || `gh exited ${code}`;
+  const http = !status ? "no HTTP response" : /^2/.test(status) ? "" : `HTTP ${status}`;
+  throw new GhError(`${[http, id && `request ${id}`, `after ${elapsed(t0)}`].filter(Boolean).join(", ")}: ${message}`,
+    !status || status.startsWith("5"));
+}
+
+function giveUp(what: string, e: unknown): never {
+  fail(`${what} failed (${e instanceof Error ? e.message : e})\nFull API trace: ${LOG}\n` +
+    `The draft release ${tag}, if made, is kept: rerun with --skip-build to resume it, or delete it with\n  gh release delete ${tag} --yes`);
+}
+
+/**
+ * Run gh, retrying transient failures with backoff (2s, 4s, 8s). Before each retry, `done` (if
+ * given) is asked whether the failed call took effect anyway: GitHub can answer 500 and still act.
+ */
+async function gh(what: string, args: string[], done?: () => Promise<boolean>): Promise<void> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await ghOnce(what, args, attempt);
+      return;
+    } catch (e) {
+      if (!(e instanceof GhError) || !e.transient || attempt >= 4) giveUp(what, e);
+      const wait = 2 ** attempt;
+      console.warn(`    ${what}: ${e.message}; retrying in ${wait}s`);
+      await Bun.sleep(wait * 1000);
+      if (done && (await done())) {
+        console.warn(`    ${what}: it went through after all`);
+        return;
+      }
+    }
+  }
+}
+
+/** Read-only gh call, retried; its stdout. */
+async function ghRead(what: string, args: string[]): Promise<string> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await ghOnce(what, args, attempt);
+    } catch (e) {
+      if (!(e instanceof GhError) || !e.transient || attempt >= 4) giveUp(what, e);
+      console.warn(`    ${what}: ${e.message}; retrying in ${2 ** attempt}s`);
+      await Bun.sleep(2 ** attempt * 1000);
+    }
+  }
+}
+
+type Asset = { name: string; size: number; state: string };
+const draftExists = async () =>
+  (JSON.parse(await ghRead("listing releases", ["release", "list", "--limit", "100", "--json", "tagName,isDraft"])) as { tagName: string; isDraft: boolean }[])
+    .some((r) => r.tagName === tag && r.isDraft);
+const uploaded = async () =>
+  (JSON.parse(await ghRead("listing the draft's files", ["release", "view", tag, "--json", "assets", "--jq", ".assets"])) as Asset[])
+    .filter((a) => a.state === "uploaded");
+const sizeOf = (path: string) => statSync(path).size;
+
 const tmp = mkdtempSync(join(tmpdir(), "patimokkha-publish-"));
 try {
   writeFileSync(join(tmp, "notes.md"), notes);
-  const p = Bun.spawn(["gh", "release", "create", tag, ...assets, "--target", head, "--title", `Bhikkhu Pāṭimokkha, ${released}`,
-    "--notes-file", join(tmp, "notes.md"), ...(values.draft ? ["--draft"] : [])], { cwd: ROOT, stdout: "inherit", stderr: "inherit" });
-  if ((await p.exited) !== 0) process.exit(1);
+  const meta = ["--target", head, "--title", `Bhikkhu Pāṭimokkha, ${released}`, "--notes-file", join(tmp, "notes.md")];
+  const t0 = performance.now();
+  if (resuming || (await draftExists())) {
+    await gh("updating the draft", ["release", "edit", tag, ...meta]);
+    console.log(`  draft ${tag} updated (${elapsed(t0)})`);
+  } else {
+    await gh("creating the draft", ["release", "create", tag, "--draft", ...meta], draftExists);
+    console.log(`  draft ${tag} created (${elapsed(t0)})`);
+  }
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }
+
+// Files already on the draft with the right size (from a resumed run) are skipped.
+const have = new Map((await uploaded()).map((a) => [a.name, a.size]));
+for (const [n, path] of assets.entries()) {
+  const name = path.split("/").pop()!;
+  const label = `  [${n + 1}/${assets.length}] ${name} (${size(sizeOf(path))})`;
+  if (have.get(name) === sizeOf(path)) {
+    console.log(`${label} already there`);
+    continue;
+  }
+  const t0 = performance.now();
+  await gh(`uploading ${name}`, ["release", "upload", tag, path, "--clobber"],
+    async () => (await uploaded()).some((a) => a.name === name && a.size === sizeOf(path)));
+  console.log(`${label} ${elapsed(t0)}`);
+}
+
+// Every file there, whole, and nothing else (but stray files from an older run of this draft).
+const there = new Map((await uploaded()).map((a) => [a.name, a.size]));
+const missing = assets.filter((p) => there.get(p.split("/").pop()!) !== sizeOf(p)).map((p) => p.split("/").pop());
+if (missing.length) fail(`after uploading, the draft ${tag} is missing or has short copies of: ${missing.join(", ")}\nFull API trace: ${LOG}\nRerun with --skip-build to resume.`);
+const stray = [...there.keys()].filter((n) => !names(assets).includes(n));
+for (const n of stray) await gh(`deleting stray ${n}`, ["release", "delete-asset", tag, n, "--yes"]);
+
+if (!values.draft) {
+  const t0 = performance.now();
+  const published = async () => !(await draftExists());
+  await gh("publishing the draft", ["release", "edit", tag, "--draft=false"], published);
+  console.log(`  published (${elapsed(t0)}): https://github.com/${repo}/releases/tag/${tag}`);
+} else console.log(`  left as a draft: https://github.com/${repo}/releases`);
 
 // ---- Roll the changelog: Unreleased becomes this release.
 

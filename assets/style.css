@@ -94,8 +94,20 @@ nav.toggles {
   font-size: 0.9rem;
 }
 nav.toggles label { cursor: pointer; user-select: none; }
-nav.toggles button { font: inherit; color: var(--muted); background: none; border: 1px solid var(--rule); border-radius: 3px; padding: 0 0.5rem; margin-left: 1rem; cursor: pointer; }
+nav.toggles button {
+  display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem;
+  color: var(--muted); background: none; border: 1px solid var(--rule); border-radius: 3px; padding: 0; margin-left: 1rem; cursor: pointer;
+}
 nav.toggles button:hover { color: var(--ink); }
+nav.toggles button svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* The icon shows where the switch leads: a moon by day, a sun by night. */
+#theme .sun { display: none; }
+:root[data-theme="dark"] #theme .sun { display: block; }
+:root[data-theme="dark"] #theme .moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #theme .sun { display: block; }
+  :root:not([data-theme="light"]) #theme .moon { display: none; }
+}
 body.hide-pali .pali, body.hide-english .english, body.hide-english .instruction { display: none; }
 body.hide-pali .passage, body.hide-english .passage, body.hide-pali .row, body.hide-english .row { display: block !important; }
 
