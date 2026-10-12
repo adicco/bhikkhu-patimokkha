@@ -20,6 +20,8 @@ RUN apt-get update \
       pandoc zip python3-fonttools python3-brotli \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+# The slim image has no locale; without UTF-8, tools decode non-ASCII arguments as garbage.
+ENV LANG=C.UTF-8
 
 RUN useradd --create-home --uid 10001 app
 WORKDIR /app

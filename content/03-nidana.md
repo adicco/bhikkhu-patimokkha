@@ -16,7 +16,7 @@ Homage to the Blessed One, the worthy one, the rightly self-awakened one.
 
 {% rubric pali="tikkhattuṁ" english="three times" /%}
 
-{% passage id="nidana" %}
+{% passage %}
 {% pali %}
 Suṇātu me {% slot name="address" bhante="bhante" avuso="āvuso" %}bhante [āvuso]{% /slot %} saṅgho. Ajj'uposatho {% slot name="day" fifteenth="paṇṇaraso" fourteenth="cātuddaso" %}paṇṇaraso [cātuddaso]{% /slot %}. Yadi saṅghassa pattakallaṁ, saṅgho uposathaṁ kareyya, pāṭimokkhaṁ uddiseyya.
 

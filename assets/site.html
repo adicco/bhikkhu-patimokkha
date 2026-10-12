@@ -1,199 +1,398 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Bhikkhu Pāṭimokkha: Pāli and English</title>
-<meta name="description" content="The Bhikkhu Pāṭimokkha in Pāli with Ṭhānissaro Bhikkhu's English translation, as PDF, EPUB, HTML and Markdown, or prepared for a particular uposatha.">
-<script>
-try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
-</script>
-<style>
-/*CSS*/
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Bhikkhu Pāṭimokkha: Pāli and English</title>
+    <meta
+      name="description"
+      content="The Bhikkhu Pāṭimokkha in Pāli with Ṭhānissaro Bhikkhu's English translation, as PDF, EPUB, HTML and Markdown, or prepared for a particular uposatha."
+    />
+    <script>
+      try {
+        const t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark")
+          document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <style>
+      /*CSS*/
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <nav class="corner">
+        <button
+          type="button"
+          class="theme"
+          id="theme"
+          aria-label="Switch to dark"
+          title="Switch to dark"
+        >
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
+          </svg>
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <path
+              d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"
+            />
+          </svg>
+        </button>
+        <a
+          class="github"
+          href="https://github.com/adicco/bhikkhu-patimokkha"
+          aria-label="Source on GitHub"
+          title="Source on GitHub"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+            />
+          </svg>
+        </a>
+      </nav>
+      <h1 lang="pi">Bhikkhu Pāṭimokkha</h1>
+      <p class="lede">
+        The bhikkhus’ rules in Pāli (Thai Dhammayut version), with Ṭhānissaro
+        Bhikkhu’s English translation, transcribed from the widely circulated
+        printing by Palelai Buddhist Temple, Singapore.
+      </p>
+    </header>
 
-<header class="masthead">
-  <nav class="corner">
-    <button type="button" class="theme" id="theme" aria-label="Switch to dark" title="Switch to dark">
-      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
-      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-    </button>
-    <a class="github" href="https://github.com/adicco/bhikkhu-patimokkha" aria-label="Source on GitHub" title="Source on GitHub">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-    </a>
-  </nav>
-  <h1 lang="pi">Bhikkhu Pāṭimokkha</h1>
-  <p class="lede">The bhikkhus’ rules in Pāli as recited in the Thai Dhammayut tradition, with Ṭhānissaro Bhikkhu’s English translation, transcribed from the widely circulated printing by Palelai Buddhist Temple, Singapore.</p>
-</header>
+    <main>
+      <section class="download" aria-labelledby="download-h">
+        <h2 id="download-h">Download</h2>
+        <div class="table-wrap">
+          <!--DOWNLOADS-->
+        </div>
+        <p class="aside">
+          The A5 booklet is laid out for A4 paper: print double-sided, flipping
+          on the short edge, then fold the stack in half.
+          <!--RELEASED-->
+        </p>
+      </section>
 
-<main>
-<section class="download" aria-labelledby="download-h">
-  <h2 id="download-h">Download</h2>
-  <div class="table-wrap">
-<!--DOWNLOADS-->
-  </div>
-  <p class="aside">The A5 booklet is laid out for A4 paper: print double-sided, flipping on the short edge, then fold the stack in half. <!--RELEASED--></p>
-</section>
+      <section class="prepare" aria-labelledby="prepare-h">
+        <h2 id="prepare-h">Prepare a copy for one occasion</h2>
+        <p class="intro">
+          Choose the day and the assembly. The readings that change from one
+          fortnight to the next are taken from the book’s own notes, and the
+          preview shows exactly what will be recited.
+        </p>
 
-<section class="prepare" aria-labelledby="prepare-h">
-  <h2 id="prepare-h">Prepare a copy for one occasion</h2>
-  <p class="intro">Choose the day and the assembly. The readings that change from one fortnight to the next are taken from the book’s own notes, and the preview shows exactly what will be recited.</p>
+        <form id="custom" novalidate autocomplete="off">
+          <div class="occasion">
+            <fieldset>
+              <legend>Day</legend>
+              <label class="field"
+                ><span>Date</span>
+                <div class="date-row">
+                  <select id="date" name="date"></select>
+                  <span id="upcoming" class="badge" hidden>Upcoming</span>
+                </div>
+              </label>
+              <p class="hint">
+                Dates and seasons follow the Mahānikāya calendar published by
+                <a href="https://splendidmoons.github.io/">Splendid Moons</a>.
+                If your community places the extra month differently, adjust the
+                season below.
+              </p>
+            </fieldset>
 
-  <form id="custom" novalidate autocomplete="off">
-    <div class="occasion">
-      <fieldset>
-        <legend>Day</legend>
-        <label class="field"><span>Date</span>
-          <div class="date-row">
-            <select id="date" name="date"></select>
-            <span id="upcoming" class="badge" hidden>Upcoming</span>
+            <fieldset>
+              <legend>Ceremony</legend>
+              <label class="choice"
+                ><input type="radio" name="ceremony" value="uposatha" checked />
+                <span>Uposatha of four or more bhikkhus</span></label
+              >
+              <label class="choice"
+                ><input type="radio" name="ceremony" value="pavarana" />
+                <span>Pavāraṇā</span></label
+              >
+              <label class="choice"
+                ><input type="radio" name="ceremony" value="group" />
+                <span>Uposatha of one to three bhikkhus</span></label
+              >
+            </fieldset>
+
+            <fieldset data-for="uposatha pavarana">
+              <legend>Season</legend>
+              <div class="choices" data-for="uposatha">
+                <label class="choice"
+                  ><input type="radio" name="season" value="hemanta" checked />
+                  <span>Cold season, <i lang="pi">hemanta</i></span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="season" value="gimha" />
+                  <span>Hot season, <i lang="pi">gimha</i></span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="season" value="vassana" />
+                  <span>Rainy season, <i lang="pi">vassāna</i></span></label
+                >
+              </div>
+              <label class="choice"
+                ><input type="checkbox" name="adhika" />
+                <span
+                  >The season has an extra month,
+                  <i lang="pi">adhikamāsa</i></span
+                ></label
+              >
+              <label class="field" data-for="uposatha"
+                ><span>Which uposatha of the season</span>
+                <select name="fortnight"></select>
+              </label>
+            </fieldset>
+
+            <fieldset data-for="uposatha pavarana group">
+              <legend>Day of the fortnight</legend>
+              <label class="choice"
+                ><input type="radio" name="day" value="fifteenth" checked />
+                <span>Fifteenth, <i lang="pi">paṇṇaraso</i></span></label
+              >
+              <label class="choice"
+                ><input type="radio" name="day" value="fourteenth" />
+                <span>Fourteenth, <i lang="pi">cātuddaso</i></span></label
+              >
+              <label class="choice" data-for="pavarana"
+                ><input type="radio" name="day" value="harmony" />
+                <span>Harmony day, <i lang="pi">sāmaggī</i></span></label
+              >
+            </fieldset>
+
+            <fieldset data-for="uposatha pavarana group">
+              <legend>Assembly</legend>
+              <label class="field" data-for="uposatha pavarana"
+                ><span>Bhikkhus present</span>
+                <select name="bhikkhus"></select>
+              </label>
+              <div class="choices" data-for="uposatha group">
+                <p class="label">The motion is given by</p>
+                <label class="choice"
+                  ><input type="radio" name="address" value="bhante" checked />
+                  <span>a junior bhikkhu, <i lang="pi">bhante</i></span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="address" value="avuso" />
+                  <span
+                    >the most senior bhikkhu, <i lang="pi">āvuso</i></span
+                  ></label
+                >
+              </div>
+              <div class="choices" data-for="uposatha">
+                <p class="label">The recitation is held</p>
+                <label class="choice"
+                  ><input type="radio" name="time" value="day" checked />
+                  <span>by daylight</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="time" value="night" />
+                  <span>at night, with a lamp</span></label
+                >
+              </div>
+              <div class="choices" data-for="uposatha">
+                <p class="label">The hall was prepared by</p>
+                <label class="choice"
+                  ><input
+                    type="radio"
+                    name="helpers"
+                    value="bhikkhus"
+                    checked
+                  />
+                  <span>bhikkhus</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="helpers" value="samaneras" />
+                  <span>novices and bhikkhus</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="helpers" value="aramikas" />
+                  <span>monastery residents and bhikkhus</span></label
+                >
+              </div>
+              <div class="choices" data-for="pavarana">
+                <p class="label">Each bhikkhu invites</p>
+                <label class="choice"
+                  ><input
+                    type="radio"
+                    name="statements"
+                    value="three"
+                    checked
+                  />
+                  <span>three times, <i lang="pi">te-vācikaṁ</i></span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="statements" value="two" />
+                  <span>twice, <i lang="pi">dve-vācikaṁ</i></span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="statements" value="one" />
+                  <span>once, <i lang="pi">eka-vācikaṁ</i></span></label
+                >
+              </div>
+            </fieldset>
           </div>
-        </label>
-        <p class="hint">Dates and seasons follow the Mahānikāya calendar published by <a href="https://splendidmoons.github.io/">Splendid Moons</a>. If your community places the extra month differently, adjust the season below.</p>
-      </fieldset>
 
-      <fieldset>
-        <legend>Ceremony</legend>
-        <label class="choice"><input type="radio" name="ceremony" value="uposatha" checked> <span>Uposatha of four or more bhikkhus</span></label>
-        <label class="choice"><input type="radio" name="ceremony" value="pavarana"> <span>Pavāraṇā</span></label>
-        <label class="choice"><input type="radio" name="ceremony" value="group"> <span>Uposatha of one to three bhikkhus</span></label>
-      </fieldset>
+          <aside class="preview" aria-labelledby="preview-h">
+            <h3 id="preview-h">What will be recited</h3>
+            <div id="preview" aria-live="polite"><!--PREVIEW--></div>
+            <p id="unglossed-key" class="key" hidden>
+              <span class="sample">Dotted</span>: the book gives no English for
+              this reading, so the English is left as printed.
+            </p>
+          </aside>
 
-      <fieldset data-for="uposatha pavarana">
-        <legend>Season</legend>
-        <div class="choices" data-for="uposatha">
-          <label class="choice"><input type="radio" name="season" value="hemanta" checked> <span>Cold season, <i lang="pi">hemanta</i></span></label>
-          <label class="choice"><input type="radio" name="season" value="gimha"> <span>Hot season, <i lang="pi">gimha</i></span></label>
-          <label class="choice"><input type="radio" name="season" value="vassana"> <span>Rainy season, <i lang="pi">vassāna</i></span></label>
-        </div>
-        <label class="choice"><input type="checkbox" name="adhika"> <span>The season has an extra month, <i lang="pi">adhikamāsa</i></span></label>
-        <label class="field" data-for="uposatha"><span>Which uposatha of the season</span>
-          <select name="fortnight"></select>
-        </label>
-      </fieldset>
+          <div class="file">
+            <fieldset class="chapter-set">
+              <legend>Chapters</legend>
+              <button type="button" id="reset-chapters" class="quiet" hidden>
+                Reset
+              </button>
+              <p class="hint" id="chapters-hint">
+                Choose a chapter’s name to build that chapter alone.
+              </p>
+              <div id="chapters" class="chapters"></div>
+            </fieldset>
 
-      <fieldset data-for="uposatha pavarana group">
-        <legend>Day of the fortnight</legend>
-        <label class="choice"><input type="radio" name="day" value="fifteenth" checked> <span>Fifteenth, <i lang="pi">paṇṇaraso</i></span></label>
-        <label class="choice"><input type="radio" name="day" value="fourteenth"> <span>Fourteenth, <i lang="pi">cātuddaso</i></span></label>
-        <label class="choice" data-for="pavarana"><input type="radio" name="day" value="harmony"> <span>Harmony day, <i lang="pi">sāmaggī</i></span></label>
-      </fieldset>
+            <fieldset>
+              <legend>File</legend>
+              <div class="choices row">
+                <p class="label">Language</p>
+                <label class="choice"
+                  ><input type="radio" name="lang" value="both" checked />
+                  <span>Pāli and English</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="lang" value="pali" />
+                  <span>Pāli</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="lang" value="english" />
+                  <span>English</span></label
+                >
+              </div>
+              <div class="choices row">
+                <p class="label">Format</p>
+                <label class="choice"
+                  ><input type="radio" name="target" value="pdf" checked />
+                  <span>PDF</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="target" value="epub" />
+                  <span>EPUB</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="target" value="html" />
+                  <span>HTML</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="target" value="md" />
+                  <span>Markdown</span></label
+                >
+              </div>
+              <div class="choices row" data-pdf>
+                <p class="label">Paper</p>
+                <label class="choice"
+                  ><input type="radio" name="paper" value="a4" />
+                  <span>A4</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="paper" value="a5" checked />
+                  <span>A5</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="paper" value="booklet" />
+                  <span>A5 booklet on A4</span></label
+                >
+              </div>
+              <div class="choices row" data-pdf data-columns>
+                <p class="label">English</p>
+                <label class="choice"
+                  ><input type="radio" name="columns" value="" checked />
+                  <span>under the Pāli</span></label
+                >
+                <label class="choice"
+                  ><input type="radio" name="columns" value="1" />
+                  <span>beside the Pāli</span></label
+                >
+              </div>
+              <div class="fields" data-pdf>
+                <label class="field"
+                  ><span>Type size</span>
+                  <select name="size">
+                    <option value="8">8 pt</option>
+                    <option value="9">9 pt</option>
+                    <option value="10">10 pt</option>
+                    <option value="11">11 pt</option>
+                    <option value="12">12 pt</option>
+                    <option value="13">13 pt</option>
+                    <option value="14">14 pt</option>
+                    <option value="15">15 pt</option>
+                    <option value="16">16 pt</option>
+                    <option value="17">17 pt</option>
+                    <option value="18">18 pt</option>
+                    <option value="19">19 pt</option>
+                    <option value="20">20 pt</option>
+                    <option value="21">21 pt</option>
+                    <option value="22">22 pt</option>
+                    <option value="23">23 pt</option>
+                    <option value="24">24 pt</option>
+                    <option value="25">25 pt</option>
+                    <option value="26">26 pt</option>
+                    <option value="27">27 pt</option>
+                    <option value="28">28 pt</option>
+                  </select>
+                </label>
+                <label class="field" data-booklet
+                  ><span>Sewn in sections of</span>
+                  <select name="signature">
+                    <option value="">one fold (the whole booklet)</option>
+                    <option value="16">16 pages</option>
+                    <option value="20">20 pages</option>
+                    <option value="24">24 pages</option>
+                    <option value="28">28 pages</option>
+                    <option value="32">32 pages</option>
+                  </select>
+                </label>
+              </div>
+              <label class="choice" data-english
+                ><input type="checkbox" name="instructions" checked />
+                <span>English instructions for the ceremonies</span></label
+              >
+            </fieldset>
 
-      <fieldset data-for="uposatha pavarana group">
-        <legend>Assembly</legend>
-        <label class="field" data-for="uposatha pavarana"><span>Bhikkhus present</span>
-          <select name="bhikkhus"></select>
-        </label>
-        <div class="choices" data-for="uposatha group">
-          <p class="label">The motion is given by</p>
-          <label class="choice"><input type="radio" name="address" value="bhante" checked> <span>a junior bhikkhu, <i lang="pi">bhante</i></span></label>
-          <label class="choice"><input type="radio" name="address" value="avuso"> <span>the most senior bhikkhu, <i lang="pi">āvuso</i></span></label>
-        </div>
-        <div class="choices" data-for="uposatha">
-          <p class="label">The recitation is held</p>
-          <label class="choice"><input type="radio" name="time" value="day" checked> <span>by daylight</span></label>
-          <label class="choice"><input type="radio" name="time" value="night"> <span>at night, with a lamp</span></label>
-        </div>
-        <div class="choices" data-for="uposatha">
-          <p class="label">The hall was prepared by</p>
-          <label class="choice"><input type="radio" name="helpers" value="bhikkhus" checked> <span>bhikkhus</span></label>
-          <label class="choice"><input type="radio" name="helpers" value="samaneras"> <span>novices and bhikkhus</span></label>
-          <label class="choice"><input type="radio" name="helpers" value="aramikas"> <span>monastery residents and bhikkhus</span></label>
-        </div>
-        <div class="choices" data-for="pavarana">
-          <p class="label">Each bhikkhu invites</p>
-          <label class="choice"><input type="radio" name="statements" value="three" checked> <span>three times, <i lang="pi">te-vācikaṁ</i></span></label>
-          <label class="choice"><input type="radio" name="statements" value="two"> <span>twice, <i lang="pi">dve-vācikaṁ</i></span></label>
-          <label class="choice"><input type="radio" name="statements" value="one"> <span>once, <i lang="pi">eka-vācikaṁ</i></span></label>
-        </div>
-      </fieldset>
-    </div>
+            <div class="actions">
+              <button type="submit" id="build">Build A5 PDF</button>
+              <p id="status" role="status" aria-live="polite"></p>
+            </div>
+            <details class="cli" hidden>
+              <summary>The same build from the command line</summary>
+              <pre><code id="cli"></code></pre>
+              <p>
+                <a href="https://github.com/adicco/bhikkhu-patimokkha"
+                  >Get source code from GitHub</a
+                >
+              </p>
+            </details>
+          </div>
+        </form>
+      </section>
+    </main>
 
-    <aside class="preview" aria-labelledby="preview-h">
-      <h3 id="preview-h">What will be recited</h3>
-      <div id="preview" aria-live="polite"><!--PREVIEW--></div>
-      <p id="unglossed-key" class="key" hidden><span class="sample">Dotted</span>: the book gives no English for this reading, so the English is left as printed.</p>
-    </aside>
+    <footer>
+      <p>
+        Pāli text and English translation: Ṭhānissaro Bhikkhu,
+        <i>Bhikkhu Pāṭimokkha</i>, Metta Forest Monastery, 2008.
+      </p>
+    </footer>
 
-    <div class="file">
-      <fieldset class="chapter-set">
-        <legend>Chapters</legend>
-        <button type="button" id="reset-chapters" class="quiet" hidden>Reset</button>
-        <p class="hint" id="chapters-hint">Choose a chapter’s name to build that chapter alone.</p>
-        <div id="chapters" class="chapters"></div>
-      </fieldset>
-
-      <fieldset>
-        <legend>File</legend>
-        <div class="choices row">
-          <p class="label">Language</p>
-          <label class="choice"><input type="radio" name="lang" value="both" checked> <span>Pāli and English</span></label>
-          <label class="choice"><input type="radio" name="lang" value="pali"> <span>Pāli</span></label>
-          <label class="choice"><input type="radio" name="lang" value="english"> <span>English</span></label>
-        </div>
-        <div class="choices row">
-          <p class="label">Format</p>
-          <label class="choice"><input type="radio" name="target" value="pdf" checked> <span>PDF</span></label>
-          <label class="choice"><input type="radio" name="target" value="epub"> <span>EPUB</span></label>
-          <label class="choice"><input type="radio" name="target" value="html"> <span>HTML</span></label>
-          <label class="choice"><input type="radio" name="target" value="md"> <span>Markdown</span></label>
-        </div>
-        <div class="choices row" data-pdf>
-          <p class="label">Paper</p>
-          <label class="choice"><input type="radio" name="paper" value="a4"> <span>A4</span></label>
-          <label class="choice"><input type="radio" name="paper" value="a5" checked> <span>A5</span></label>
-          <label class="choice"><input type="radio" name="paper" value="booklet"> <span>A5 booklet on A4</span></label>
-        </div>
-        <div class="choices row" data-pdf data-columns>
-          <p class="label">English</p>
-          <label class="choice"><input type="radio" name="columns" value="" checked> <span>under the Pāli</span></label>
-          <label class="choice"><input type="radio" name="columns" value="1"> <span>beside the Pāli</span></label>
-        </div>
-        <div class="fields" data-pdf>
-          <label class="field"><span>Type size</span>
-            <select name="size">
-              <option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option><option value="11">11 pt</option><option value="12">12 pt</option>
-              <option value="13">13 pt</option><option value="14">14 pt</option><option value="15">15 pt</option><option value="16">16 pt</option><option value="17">17 pt</option>
-              <option value="18">18 pt</option><option value="19">19 pt</option><option value="20">20 pt</option><option value="21">21 pt</option><option value="22">22 pt</option>
-              <option value="23">23 pt</option><option value="24">24 pt</option><option value="25">25 pt</option><option value="26">26 pt</option><option value="27">27 pt</option>
-              <option value="28">28 pt</option>
-            </select>
-          </label>
-          <label class="field" data-booklet><span>Sewn in sections of</span>
-            <select name="signature">
-              <option value="">one fold (the whole booklet)</option>
-              <option value="16">16 pages</option><option value="20">20 pages</option><option value="24">24 pages</option>
-              <option value="28">28 pages</option><option value="32">32 pages</option>
-            </select>
-          </label>
-        </div>
-        <label class="choice" data-english><input type="checkbox" name="instructions" checked> <span>English instructions for the ceremonies</span></label>
-      </fieldset>
-
-      <div class="actions">
-        <button type="submit" id="build">Build A5 PDF</button>
-        <p id="status" role="status" aria-live="polite"></p>
-      </div>
-      <details class="cli" hidden>
-        <summary>The same build from the command line</summary>
-        <pre><code id="cli"></code></pre>
-        <p><a href="https://github.com/adicco/bhikkhu-patimokkha">Get source code from GitHub</a></p>
-      </details>
-    </div>
-  </form>
-</section>
-</main>
-
-<footer>
-  <p>Pāli text and English translation: Ṭhānissaro Bhikkhu, <i>Bhikkhu Pāṭimokkha</i>, Metta Forest Monastery, 2008.</p>
-</footer>
-
-<script>const DATA = /*DATA*/;</script>
-<script>
-/*JS*/
-</script>
-</body>
+    <script>
+      const DATA = /*DATA*/;
+    </script>
+    <script>
+      /*JS*/
+    </script>
+  </body>
 </html>

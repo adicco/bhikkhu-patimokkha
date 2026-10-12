@@ -151,6 +151,22 @@ function uuidFrom(s: string) {
 }
 
 /**
+ * Gives every heading without an id an ASCII one ("Pārājika" → "parajika"). Left to itself, pandoc
+ * makes ids like "pārājika", and some EPUB readers (Lithium) can't follow links to them.
+ */
+function asciiHeadingIds(html: string) {
+  const taken = new Set([...html.matchAll(/\bid="([^"]*)"/g)].map((m) => m[1]));
+  return html.replace(/<h([1-6])(?![^>]*\bid=)([^>]*)>([\s\S]*?)<\/h\1>/g, (_, n, attrs, inner) => {
+    const base = inner.replace(/<[^>]*>/g, " ").replace(/&[a-z]+;|&#\d+;/g, " ").normalize("NFD")
+      .replace(/[^\x00-\x7f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "section";
+    let id = base;
+    for (let i = 1; taken.has(id); i++) id = `${base}-${i}`;
+    taken.add(id);
+    return `<h${n} id="${id}"${attrs}>${inner}</h${n}>`;
+  });
+}
+
+/**
  * LuaLaTeX on `${name}.tex`, with the PDF's trailer ID taken from the source instead of the clock.
  * With SOURCE_DATE_EPOCH and FORCE_SOURCE_DATE=1 set (as `bun run release` does), the same source
  * then gives a byte-identical PDF, which is what lets releases name files by content hash.
@@ -197,18 +213,26 @@ if (targets.has("html") || targets.has("epub")) {
 if (targets.has("epub")) {
   const css = join(import.meta.dir, "..", "assets", "style.css");
   const epubHtml = join(outDir, `.${base}.epub.html`);
-  const epubSource = toHtml(rendered, show, { title, standalone: false, embedCss: false });
+  const epubSource = asciiHeadingIds(toHtml(rendered, show, { title, standalone: false, embedCss: false }));
   writeFileSync(epubHtml, epubSource);
-  await run([
-    "pandoc", `.${base}.epub.html`, "-f", "html", "-o", `${base}.epub`,
-    "--css", css, "--split-level=2", "--toc", "--toc-depth=2",
-    "--metadata", `title=${title}`, "--metadata", "author=Ṭhānissaro Bhikkhu (tr.)",
-    "--metadata", `lang=${show.pali && !show.english ? "pi" : "en"}`,
+  // Metadata goes in a file, not on the command line: pandoc decodes argv in the locale's
+  // encoding, so under a C/POSIX locale (the Docker image) "Pāṭimokkha" became "P�����imokkha".
+  // Files are always read as UTF-8. JSON is valid YAML.
+  const epubMeta = join(outDir, `.${base}.epub.yaml`);
+  writeFileSync(epubMeta, JSON.stringify({
+    title, author: "Ṭhānissaro Bhikkhu (tr.)", lang: show.pali && !show.english ? "pi" : "en",
     // Derived from the content rather than random, so that the same text gives the same file.
-    "--metadata", `identifier=urn:uuid:${uuidFrom(epubSource)}`,
+    identifier: `urn:uuid:${uuidFrom(epubSource)}`,
+  }));
+  await run([
+    // ascii_identifiers covers the ids pandoc still makes itself (the title chapter's section).
+    "pandoc", `.${base}.epub.html`, "-f", "html", "-t", "epub3+ascii_identifiers", "-o", `${base}.epub`,
+    "--css", css, "--split-level=2", "--toc", "--toc-depth=2",
+    "--metadata-file", epubMeta,
     ...gentiumFiles().map((f) => `--epub-embed-font=${f}`),
   ]);
   rmSync(epubHtml);
+  rmSync(epubMeta);
   console.log(`epub  ${join(outDir, `${base}.epub`)}`);
 }
 

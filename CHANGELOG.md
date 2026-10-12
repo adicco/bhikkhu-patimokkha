@@ -6,6 +6,8 @@ tag. Left empty, the notes list the commit messages since the last release.
 
 ## Unreleased
 
+**EPUB fixes**: The title and author no longer turn into "P�����imokkha" in builds from the website. Table-of-contents links now open the right chapter in readers such as Lithium, which showed "Content missing" because chapter anchors contained diacritics (`#pārājika`). All three EPUBs now pass epubcheck (a duplicate `nidana` id is gone).
+
 ## v2026.10.12.1 (12 October 2026)
 
 **v1.2**: Switch to 13pt as the base font size for PDF renderings (Pāli, Pāli and English, and English), as 12pt might be too small for a number of students; the English beside or under the Pāli goes up to 12pt.
