@@ -10,7 +10,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium, type Browser, type Page } from "playwright-core";
-import { baseName, combinedHash, FORMATS, hashedName, LANGS } from "../src/artifacts";
+import { EDITION, FORMATS, LANGS, releaseName } from "../src/artifacts";
 import type { Manifest, ManifestFile } from "../src/release";
 import { writeSite } from "../src/site";
 
@@ -33,18 +33,15 @@ export async function startSite(): Promise<Site> {
 
   const files: ManifestFile[] = [];
   for (const { lang } of LANGS) {
-    const stand = FORMATS.map((f) => {
+    for (const f of FORMATS) {
       const body = `stand-in for ${lang} ${f.kind}\n`;
-      return { f, body, sha256: new Bun.CryptoHasher("sha256").update(body).digest("hex") };
-    });
-    const hash = combinedHash(stand.map((s) => s.sha256));
-    for (const { f, body, sha256 } of stand) {
-      const name = hashedName(f.built(baseName(lang)), hash);
+      const sha256 = new Bun.CryptoHasher("sha256").update(body).digest("hex");
+      const name = releaseName(lang, f.kind, sha256.slice(0, 10));
       writeFileSync(join(site, "files", name), body);
       files.push({ lang, kind: f.kind, file: `files/${name}`, bytes: body.length, sha256 });
     }
   }
-  const manifest: Manifest = { generated: `${TODAY}T00:00:00Z`, commit: "e2e", sourceDate: `${TODAY}T00:00:00Z`, files };
+  const manifest: Manifest = { generated: `${TODAY}T00:00:00Z`, edition: EDITION, commit: "e2e", sourceDate: `${TODAY}T00:00:00Z`, files };
   writeFileSync(join(site, "manifest.json"), JSON.stringify(manifest));
   await writeSite(site, manifest, { today: TODAY });
 

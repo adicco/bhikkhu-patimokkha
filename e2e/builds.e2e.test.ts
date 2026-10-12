@@ -72,7 +72,7 @@ describe("PDF", () => {
     const t0 = performance.now();
     const { name, path, status } = await buildFromForm(page);
     const first = performance.now() - t0;
-    expect(name).toMatch(/^Bhikkhu-Patimokkha\.Pali-English\.custom\.A5\.[0-9a-f]{10}\.pdf$/);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.eng\.custom\.a5\.[0-9a-f]{10}\.pdf$/);
     expect(status).toBe(`Built ${name}.`);
     expect(pdfInfo(path)).toMatchObject(A5);
     const text = pdfText(path);
@@ -96,7 +96,7 @@ describe("PDF", () => {
   test("A4 with the English beside the Pāli", () => withPage(async (page) => {
     await configure(page, [["#date", UPOSATHA], ["solo", "Pubba-kicca"], ["paper", "a4"], ["columns", "1"]]);
     const { name, path } = await buildFromForm(page);
-    expect(name).toMatch(/\.custom\.A4\.[0-9a-f]{10}\.pdf$/);
+    expect(name).toMatch(/\.pali\.eng\.custom\.a4\.[0-9a-f]{10}\.pdf$/);
     expect(pdfInfo(path)).toMatchObject(A4);
     // Laid out side by side, the counting passage and its English start on the same line.
     const layout = sh(["pdftotext", "-layout", path, "-"]);
@@ -109,7 +109,7 @@ describe("PDF", () => {
       ['select[name="signature"]', "16"], ["solo", "Pubba-kicca"], ["chapter", "nidana"], ["address", "avuso"],
     ]);
     const { name, path } = await buildFromForm(page);
-    expect(name).toMatch(/^Bhikkhu-Patimokkha\.Pali\.custom\.A5-booklet\.[0-9a-f]{10}\.pdf$/);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.only\.custom\.a5-booklet\.[0-9a-f]{10}\.pdf$/);
     const info = pdfInfo(path);
     expect({ width: info.width, height: info.height }).toEqual({ width: A4.height, height: A4.width }); // A4 landscape
     expect(info.pages % 2).toBe(0);
@@ -134,7 +134,7 @@ describe("EPUB, HTML and Markdown", () => {
       ["day", "harmony"], ["statements", "two"],
     ]);
     const { name, path } = await buildFromForm(page);
-    expect(name).toMatch(/^Bhikkhu-Patimokkha\.Pali-English\.custom\.[0-9a-f]{10}\.epub$/);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.eng\.custom\.[0-9a-f]{10}\.epub$/);
     const files = unzipList(path);
     expect(files).toContain("mimetype");
     expect(files.some((f) => /fonts\/GentiumPlus-Regular\.ttf$/.test(f))).toBe(true);
@@ -149,7 +149,7 @@ describe("EPUB, HTML and Markdown", () => {
   test("HTML of a small-group uposatha, with and without the English instructions", () => withPage(async (page) => {
     await configure(page, [["target", "html"], ["ceremony", "group"], ["address", "avuso"], ["day", "fourteenth"]]);
     const first = await buildFromForm(page);
-    expect(first.name).toMatch(/^Bhikkhu-Patimokkha\.Pali-English\.custom\.[0-9a-f]{10}\.html$/);
+    expect(first.name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.eng\.custom\.[0-9a-f]{10}\.html$/);
     const html = await Bun.file(first.path).text();
     expect(html).toContain("Suṇantu me <span class=\"slot\" data-slot=\"address\" data-set=\"\">āvuso</span> āyasmantā");
     expect(html).toContain("ajj’uposatho <span class=\"slot\" data-slot=\"day\" data-set=\"\">cātuddaso</span>");
@@ -166,7 +166,7 @@ describe("EPUB, HTML and Markdown", () => {
   test("Markdown of chosen chapters, zipped", () => withPage(async (page) => {
     await configure(page, [["#date", UPOSATHA], ["target", "md"], ["solo", "Pubba-kicca"], ["chapter", "nidana"], ["season", "gimha"], ["select[name=\"fortnight\"]", "2"]]);
     const { name, path } = await buildFromForm(page);
-    expect(name).toMatch(/^Bhikkhu-Patimokkha\.Pali-English\.custom\.Markdown\.[0-9a-f]{10}\.zip$/);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.eng\.custom\.md\.[0-9a-f]{10}\.zip$/);
     expect(unzipList(path)).toEqual(["Bhikkhu-Patimokkha.Pali-English.md", "md/01-pubba-kicca.md", "md/03-nidana.md"]);
     const md = sh(["unzip", "-p", path, "md/01-pubba-kicca.md"]);
     expect(md).toContain("Ayaṁ *gimhotu*.");
@@ -177,7 +177,7 @@ describe("EPUB, HTML and Markdown", () => {
   test("English only", () => withPage(async (page) => {
     await configure(page, [["#date", UPOSATHA], ["lang", "english"], ["target", "html"], ["solo", "Nidāna"]]);
     const { name, path } = await buildFromForm(page);
-    expect(name).toMatch(/^Bhikkhu-Patimokkha\.English\.custom\.[0-9a-f]{10}\.html$/);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.eng\.only\.custom\.[0-9a-f]{10}\.html$/);
     const html = await Bun.file(path).text();
     expect(html).toContain("Today is the Uposatha of the <span class=\"slot\" data-slot=\"day\" data-set=\"\">fourteenth</span>");
     expect(html).not.toContain("Ajj’uposatho");

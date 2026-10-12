@@ -308,7 +308,7 @@
     try {
       const res = await fetch("api/build", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error((await res.json().catch(() => null))?.error ?? `The server answered ${res.status}.`);
-      const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "Bhikkhu-Patimokkha";
+      const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "bhikkhu-patimokkha";
       const blob = await res.blob();
       const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name });
       document.body.append(a);

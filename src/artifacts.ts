@@ -1,23 +1,31 @@
 /** The files a build produces, and how releases name them by content. */
-import { readdirSync, utimesSync } from "node:fs";
+import { readdirSync, readFileSync, utimesSync } from "node:fs";
 import { basename, join } from "node:path";
 import type { Lang } from "./options";
 
-export const LANGS: { lang: Lang; label: string; suffix: string }[] = [
-  { lang: "both", label: "Pāli and English", suffix: "Pali-English" },
-  { lang: "pali", label: "Pāli", suffix: "Pali" },
-  { lang: "english", label: "English", suffix: "English" },
+/**
+ * The version of the text (content/edition.json, kept in git). Bump it when the text changes;
+ * a change of design or format changes only the files' hashes.
+ */
+export const EDITION: string = JSON.parse(readFileSync(join(import.meta.dir, "..", "content", "edition.json"), "utf8")).version;
+
+/** `suffix` names the build's own files in dist/; `tag` the released ones. */
+export const LANGS: { lang: Lang; label: string; suffix: string; tag: string }[] = [
+  { lang: "both", label: "Pāli and English", suffix: "Pali-English", tag: "pali.eng" },
+  { lang: "pali", label: "Pāli", suffix: "Pali", tag: "pali.only" },
+  { lang: "english", label: "English", suffix: "English", tag: "eng.only" },
 ];
 
 export type Kind = "a4" | "a5" | "booklet" | "epub" | "html" | "md";
 
-export const FORMATS: { kind: Kind; label: string; target: "pdf" | "epub" | "html" | "md"; built: (base: string) => string }[] = [
-  { kind: "a4", label: "A4 PDF", target: "pdf", built: (b) => `${b}.A4.pdf` },
-  { kind: "a5", label: "A5 PDF", target: "pdf", built: (b) => `${b}.A5.pdf` },
-  { kind: "booklet", label: "A5 booklet", target: "pdf", built: (b) => `${b}.A5-booklet.pdf` },
-  { kind: "epub", label: "EPUB", target: "epub", built: (b) => `${b}.epub` },
-  { kind: "html", label: "HTML", target: "html", built: (b) => `${b}.html` },
-  { kind: "md", label: "Markdown", target: "md", built: (b) => `${b}.Markdown.zip` },
+/** `built` is the file a build writes; `tag` and `ext` make the released name (see releaseName). */
+export const FORMATS: { kind: Kind; label: string; target: "pdf" | "epub" | "html" | "md"; built: (base: string) => string; tag?: string; ext: string }[] = [
+  { kind: "a4", label: "A4 PDF", target: "pdf", built: (b) => `${b}.A4.pdf`, tag: "a4", ext: "pdf" },
+  { kind: "a5", label: "A5 PDF", target: "pdf", built: (b) => `${b}.A5.pdf`, tag: "a5", ext: "pdf" },
+  { kind: "booklet", label: "A5 booklet", target: "pdf", built: (b) => `${b}.A5-booklet.pdf`, tag: "a5-booklet", ext: "pdf" },
+  { kind: "epub", label: "EPUB", target: "epub", built: (b) => `${b}.epub`, ext: "epub" },
+  { kind: "html", label: "HTML", target: "html", built: (b) => `${b}.html`, ext: "html" },
+  { kind: "md", label: "Markdown", target: "md", built: (b) => `${b}.Markdown.zip`, tag: "md", ext: "zip" },
 ];
 
 export const baseName = (lang: Lang) => `Bhikkhu-Patimokkha.${LANGS.find((l) => l.lang === lang)!.suffix}`;
@@ -29,11 +37,15 @@ export async function hashFile(path: string) {
 }
 
 /**
- * One short hash for a set of files (a language's formats), from their SHA-256 digests in order,
- * so the files share a name stem yet any change to any of them still changes it.
+ * A released file's name: bhikkhu-patimokkha.v1.0.pali.eng.a4.<hash>.pdf. The version is the
+ * text's (EDITION); the hash is the file's own, so it follows any change to that format alone.
+ * Custom builds (serve.ts) put `custom` after the languages.
  */
-export function combinedHash(sha256s: string[]) {
-  return new Bun.CryptoHasher("sha256").update(sha256s.join("\n")).digest("hex").slice(0, 10);
+export function releaseName(lang: Lang, kind: Kind, hash: string, opts: { custom?: boolean; edition?: string } = {}) {
+  const f = FORMATS.find((x) => x.kind === kind)!;
+  const parts = ["bhikkhu-patimokkha", `v${opts.edition ?? EDITION}`, LANGS.find((l) => l.lang === lang)!.tag,
+    ...(opts.custom ? ["custom"] : []), ...(f.tag ? [f.tag] : []), hash, f.ext];
+  return parts.join(".");
 }
 
 /** "x.A4.pdf" + hash → "x.A4.<hash>.pdf" */

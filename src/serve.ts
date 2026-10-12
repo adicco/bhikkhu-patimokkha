@@ -18,7 +18,7 @@
  */
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
-import { baseName, FORMATS, hashedName, hashFile, zipMarkdown } from "./artifacts";
+import { baseName, FORMATS, hashFile, releaseName, zipMarkdown } from "./artifacts";
 import { loadChapters } from "./load";
 import { OCCASION_CHOICES, occasionErrors, type Occasion } from "./occasion";
 import type { Lang } from "./options";
@@ -224,7 +224,7 @@ async function run(req: BuildRequest, args: string[], dir: string) {
     const base = baseName(req.lang);
     const kind = req.target === "pdf" ? req.paper : req.target;
     const built = req.target === "md" ? await zipMarkdown(out, base) : join(out, FORMATS.find((f) => f.kind === kind)!.built(base));
-    const name = hashedName(built, (await hashFile(built)).short).replace(base, `${base}.custom`);
+    const name = releaseName(req.lang, kind, (await hashFile(built)).short, { custom: true });
     const staged = join(tmp, "entry");
     mkdirSync(staged);
     renameSync(built, join(staged, name));

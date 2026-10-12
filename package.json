@@ -7,6 +7,7 @@
     "build": "bun src/build.ts",
     "build:all": "bun src/build.ts all --lang both && bun src/build.ts all --lang pali && bun src/build.ts all --lang english",
     "release": "bun src/release.ts",
+    "publish": "bun src/publish.ts",
     "site": "bun src/site.ts",
     "serve": "bun src/serve.ts",
     "check": "bun src/check.ts",

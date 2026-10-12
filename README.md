@@ -79,13 +79,16 @@ bun run build -- pdf --paper a5 --chapters pubba-kicca,nidana \
 bun run release      # every standard build → dist/site/ (files/, manifest.json, index.html)
 bun run serve        # the site plus custom builds on :3000 (PORT, HOST, SITE_DIR, … in src/serve.ts)
 bun run site         # regenerate dist/site/index.html alone from its manifest.json
+bun run publish      # build, then publish as a GitHub release; notes from CHANGELOG.md "## Unreleased" (--dry-run, --draft, --help)
 ```
 
 `release` builds the three languages in every format, zips the Markdown, and copies each file
-to `dist/site/files/` with a content hash in the name. A language's formats share one hash,
-taken over all of their contents (`Bhikkhu-Patimokkha.Pali.A5.a545767bd6.pdf`,
-`Bhikkhu-Patimokkha.Pali.a545767bd6.epub`), so it changes whenever any of them does. The index page links to those names, so they
-can be cached forever. Builds are reproducible (`SOURCE_DATE_EPOCH` defaults to the last
+to `dist/site/files/` as `bhikkhu-patimokkha.v<version>.<languages>[.<format>].<hash>.<ext>`:
+`bhikkhu-patimokkha.v1.0.pali.eng.a4.a545767bd6.pdf`, `….pali.only.a5-booklet.….pdf`,
+`….eng.only.….epub`, `….pali.eng.md.….zip`. The version is the text's, from
+`content/edition.json`: bump it when the text changes. The hash is the file's own content hash,
+so a change to one format's design renames only that format's files. The index page links to
+those names, so they can be cached forever. Builds are reproducible (`SOURCE_DATE_EPOCH` defaults to the last
 commit's time, and the PDF and EPUB identifiers are derived from their source), so text that
 hasn't changed keeps its file names from one release to the next.
 

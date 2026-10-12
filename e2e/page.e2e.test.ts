@@ -42,7 +42,7 @@ describe("downloads", () => {
     const hrefs = await page.$$eval("table.downloads a", (as) => as.map((a) => a.getAttribute("href")!));
     expect(hrefs.sort()).toEqual(site.manifest.files.map((f) => f.file).sort());
     for (const href of hrefs) {
-      expect(href).toMatch(/^files\/Bhikkhu-Patimokkha\.(Pali|English|Pali-English)\.[\w-]+\.[0-9a-f]{10}\.(pdf|epub|html|zip)$|^files\/Bhikkhu-Patimokkha\.(Pali|English|Pali-English)\.[0-9a-f]{10}\.(epub|html)$/);
+      expect(href).toMatch(/^files\/bhikkhu-patimokkha\.v\d+\.\d+\.(pali\.eng|pali\.only|eng\.only)\.((a4|a5|a5-booklet)\.[0-9a-f]{10}\.pdf|[0-9a-f]{10}\.(epub|html)|md\.[0-9a-f]{10}\.zip)$/);
       const res = await page.request.get(site.url + href);
       expect(res.status()).toBe(200);
       expect(res.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");

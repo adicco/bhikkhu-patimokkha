@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { combinedHash, hashedName } from "../src/artifacts";
+import { EDITION, hashedName, releaseName } from "../src/artifacts";
 import { uposathaDays } from "../src/calendar";
 import { loadChapters, render } from "../src/load";
 import { NUMBERS, occasionErrors, reading, SEASON_TABLES, SLOT_NAMES, type Occasion } from "../src/occasion";
@@ -121,9 +121,13 @@ test("release file names carry the hash before the extension", () => {
   expect(hashedName("Bhikkhu-Patimokkha.Pali.Markdown.zip", "abc")).toBe("Bhikkhu-Patimokkha.Pali.Markdown.abc.zip");
 });
 
-test("a language's formats share one hash that follows every file", () => {
-  const h = combinedHash(["a".repeat(64), "b".repeat(64)]);
-  expect(h).toMatch(/^[0-9a-f]{10}$/);
-  expect(combinedHash(["a".repeat(64), "b".repeat(64)])).toBe(h);
-  expect(combinedHash(["a".repeat(64), "c".repeat(64)])).not.toBe(h);
+test("release names carry the text's version, the languages, the format and the file's hash", () => {
+  expect(EDITION).toMatch(/^\d+\.\d+$/);
+  const h = "0123456789";
+  expect(releaseName("both", "a4", h, { edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.eng.a4.0123456789.pdf");
+  expect(releaseName("pali", "booklet", h, { edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.only.a5-booklet.0123456789.pdf");
+  expect(releaseName("english", "epub", h, { edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.eng.only.0123456789.epub");
+  expect(releaseName("both", "md", h, { edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.eng.md.0123456789.zip");
+  expect(releaseName("pali", "a5", h, { custom: true, edition: "1.0" })).toBe("bhikkhu-patimokkha.v1.0.pali.only.custom.a5.0123456789.pdf");
+  expect(releaseName("both", "html", h)).toBe(`bhikkhu-patimokkha.v${EDITION}.pali.eng.0123456789.html`);
 });
