@@ -58,8 +58,8 @@ describe("builds", () => {
     expect(en).not.toMatch(/^(> )?”/m);
   });
 
-  test("book readings are kept unless corrections are requested", () => {
-    expect(md("pali")).toContain("muḷho’si");
-    expect(md("pali", { corrections: true })).toContain("mūḷho’si");
+  test("readings are corrected unless the book's own are requested", () => {
+    expect(md("pali")).toContain("mūḷho’si");
+    expect(md("pali", { corrections: false })).toContain("muḷho’si");
   });
 });

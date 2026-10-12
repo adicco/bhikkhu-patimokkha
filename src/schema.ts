@@ -179,9 +179,9 @@ export const tags: Record<string, Schema> = {
     attributes: { correction: { type: String, required: true } },
     transform(node, config) {
       const a = node.transformAttributes(config);
-      const fixed = show(config).corrections;
-      return new Tag("span", { class: "sic", title: fixed ? undefined : `read: ${a.correction}` },
-        fixed ? [a.correction] : children(node, config));
+      // Corrected, the reading is simply the text; printed as the book has it, it's marked.
+      if (show(config).corrections) return a.correction;
+      return new Tag("span", { class: "sic", title: `read: ${a.correction}` }, children(node, config));
     },
   },
 

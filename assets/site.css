@@ -3,34 +3,23 @@
 @font-face { font-family: "Gentium Plus"; src: url(ITALIC) format("woff2"), local("Gentium Plus Italic"); font-style: italic; font-display: swap; }
 
 :root {
-  --leaf: #ECEEE6;      /* palm leaf in shade: the page */
-  --leaf-lit: #F7F8F3;  /* the preview, a page held to the light */
-  --ink: #1F261D;       /* lampblack */
-  --stylus: #556052;    /* secondary text */
-  --dye: #7A4E0F;       /* jackfruit-wood dye: whatever changes with the occasion, and the one action */
-  --rule: #C7CEBF;
-  --lamp: #F2D38A;      /* a reading lights up when it changes */
-  --dye-press: #64400C; /* the action under the pointer */
-  --fault: #8E2A1B;     /* a build that can't go ahead */
+  /* Each colour by daylight, then the same leaf by lamplight. The system picks, unless the
+     masthead's switch has (html[data-theme]). */
+  --leaf: light-dark(#ECEEE6, #161A15);      /* palm leaf in shade: the page */
+  --leaf-lit: light-dark(#F7F8F3, #1F241D);  /* the preview, a page held to the light */
+  --ink: light-dark(#1F261D, #E2E6DA);       /* lampblack */
+  --stylus: light-dark(#556052, #9BA596);    /* secondary text */
+  --dye: light-dark(#7A4E0F, #D9A65A);       /* jackfruit-wood dye: whatever changes with the occasion, and the one action */
+  --rule: light-dark(#C7CEBF, #3A4237);
+  --lamp: light-dark(#F2D38A, #6B5220);      /* a reading lights up when it changes */
+  --dye-press: light-dark(#64400C, #E8BD7C); /* the action under the pointer */
+  --fault: light-dark(#8E2A1B, #E8907B);     /* a build that can't go ahead */
   --measure: 34em;
   font-size: 118.75%;   /* 19px: Gentium's small x-height wants it */
   color-scheme: light dark;
 }
-
-/* The same leaf by lamplight. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --leaf: #161A15;
-    --leaf-lit: #1F241D;
-    --ink: #E2E6DA;
-    --stylus: #9BA596;
-    --dye: #D9A65A;
-    --rule: #3A4237;
-    --lamp: #6B5220;
-    --dye-press: #E8BD7C;
-    --fault: #E8907B;
-  }
-}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 html { background: var(--leaf); color: var(--ink); }
@@ -50,7 +39,14 @@ a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--dye); outline-offset: 3px; border-radius: 2px; }
 
 /* Masthead: the title in the book's face, large; one sentence of what this is. */
-.masthead { margin-bottom: 3.5rem; }
+.masthead { margin-bottom: 3.5rem; position: relative; }
+/* Daylight or lamplight: a quiet switch in the masthead's corner. */
+button.theme {
+  position: absolute; top: -2rem; right: 0;
+  font: inherit; font-size: 0.88rem; color: var(--stylus); background: none;
+  border: 1px solid var(--rule); border-radius: 3px; padding: 0.15rem 0.6rem;
+}
+button.theme:hover { background: var(--leaf-lit); color: var(--ink); border-color: var(--stylus); }
 h1 {
   font-weight: normal;
   font-size: clamp(2.6rem, 7vw, 4.2rem);

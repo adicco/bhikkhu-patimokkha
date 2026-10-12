@@ -46,8 +46,8 @@ the OCR.
 
 ## Readings in the book that look like typos
 
-These are kept as printed and marked with `{% sic %}`. `bun run build -- --corrections`
-substitutes the suggested reading instead.
+These are marked with `{% sic %}` and the source keeps the printed reading. Builds substitute the
+suggested reading; `bun run build -- --no-corrections` prints the book's own instead.
 
 | where | printed | suggested |
 |---|---|---|
@@ -75,7 +75,7 @@ Custom builds (`--season`, `--bhikkhus` …, see the main README) substitute rea
 and LaTeX outputs are byte-identical to the earlier ones, and the HTML differs only by the slot
 spans. The Pāli substitutes are taken verbatim from the notes (test/occasion.test.ts checks every
 one against the notes chapter and the Pavāraṇā chapter). Note 4's *sattā* is substituted with
-its `{% sic %}`, so it prints as the book has it unless `--corrections` is given.
+its `{% sic %}`, so it is corrected like the rest unless `--no-corrections` is given.
 
 English: the book glosses only some of these readings. Where a note gives a gloss, it is used;
 otherwise the English is left as printed (and the HTML marks it `unglossed`). Choices made in

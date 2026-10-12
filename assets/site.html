@@ -6,6 +6,9 @@
 <meta name="color-scheme" content="light dark">
 <title>Bhikkhu Pāṭimokkha: Pāli and English</title>
 <meta name="description" content="The Bhikkhu Pāṭimokkha in Pāli with Ṭhānissaro Bhikkhu's English translation, as PDF, EPUB, HTML and Markdown, or prepared for a particular uposatha.">
+<script>
+try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
+</script>
 <style>
 /*CSS*/
 </style>
@@ -13,6 +16,7 @@
 <body>
 
 <header class="masthead">
+  <button type="button" class="theme" id="theme" aria-label="Switch between light and dark">Dark</button>
   <h1 lang="pi">Bhikkhu Pāṭimokkha</h1>
   <p class="lede">The bhikkhus’ rules in Pāli, with Ṭhānissaro Bhikkhu’s English translation, transcribed from the Metta Forest Monastery edition of 2008.</p>
 </header>

@@ -227,7 +227,7 @@ describe("the preview", () => {
 
     await change(page, () => page.check(radio("season", "vassana")));
     text = await previewText(page);
-    expect(text).toContain("Ayaṁ vassānotu. Asmiñ-ca utumhi sattā ca uposathā ekā ca pavāraṇā."); // the book's "sattā", as printed
+    expect(text).toContain("Ayaṁ vassānotu. Asmiñ-ca utumhi satta ca uposathā ekā ca pavāraṇā."); // the book's "sattā", corrected
     expect(text).toContain("dve uposathā atikkantā,\ncattāro ca uposathā ekā ca pavāraṇā avasiṭṭhā.");
     expect(text).toContain("there are seven uposathas and one pavāraṇā");
 

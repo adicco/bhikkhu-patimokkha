@@ -61,7 +61,7 @@ describe("occasion", () => {
     const text = md(o, ["pubba-kicca", "nidana"]);
     expect(text).toContain("*Tattha purimāni cattāri¹* bhikkhūnaṁ vattaṁ jānantehi *sāmaṇerehi-pi bhikkhūhi-pi²*");
     expect(text).toContain("The first four have been done by novices and bhikkhus");
-    expect(text).toContain("Ayaṁ *vassānotu³*. Asmiñ-ca utumhi *sattā ca uposathā ekā ca pavāraṇā⁴*.");
+    expect(text).toContain("Ayaṁ *vassānotu³*. Asmiñ-ca utumhi *satta ca uposathā ekā ca pavāraṇā⁴*.");
     expect(text).toContain("*dve uposathā atikkantā,\\\ncattāro ca uposathā ekā ca pavāraṇā avasiṭṭhā⁵*.");
     expect(text).toContain("uposath’agge *bārasa⁶* bhikkhū");
     expect(text).toContain("Hall *12* bhikkhus".replace("Hall", "hall"));

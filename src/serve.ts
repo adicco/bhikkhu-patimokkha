@@ -120,7 +120,7 @@ function parse(body: any): { req?: BuildRequest; args: string[]; errors: string[
   if (req.chapters.length !== SLUGS.length) args.push("--chapters", req.chapters.join(","));
   args.push(req.notes ? "--notes" : "--no-notes");
   args.push(req.instructions ? "--instructions" : "--no-instructions");
-  // --corrections is for the project's own builds; the site always prints the book's readings.
+  // Corrections are on by default; the site always builds with them (--no-corrections isn't offered).
   const oc = occasion;
   if (oc.time) args.push("--time", oc.time);
   if (oc.helpers) args.push("--helpers", oc.helpers);

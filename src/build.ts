@@ -27,7 +27,9 @@ Output:
   --notes, --no-notes           include/omit the notes (default: on unless --lang pali)
   --instructions, --no-instructions
                                 include/omit the English rubrics (default: on unless --lang pali)
-  --corrections                 print the suggested correction for {% sic %} readings
+  --corrections, --no-corrections
+                                print the suggested correction for {% sic %} readings,
+                                or the book's own reading (default: corrections)
 
 PDF:
   --paper a4,a5,booklet         paper sizes to make (default: all three)
@@ -63,7 +65,8 @@ const { values, positionals } = parseCli("src/build.ts", HELP, {
   "no-notes": { type: "boolean" },
   instructions: { type: "boolean" },
   "no-instructions": { type: "boolean" },
-  corrections: { type: "boolean", default: false },
+  corrections: { type: "boolean" },
+  "no-corrections": { type: "boolean" },
   out: { type: "string", default: "dist" },
   chapters: { type: "string" },
   time: { type: "string" },
@@ -110,7 +113,7 @@ const flag = (on?: boolean, off?: boolean) => (on ? true : off ? false : undefin
 const overrides = Object.fromEntries(Object.entries({
   notes: flag(values.notes, values["no-notes"]),
   instructions: flag(values.instructions, values["no-instructions"]),
-  corrections: values.corrections,
+  corrections: flag(values.corrections, values["no-corrections"]),
 }).filter(([, v]) => v !== undefined));
 const show = showFor(lang, overrides);
 

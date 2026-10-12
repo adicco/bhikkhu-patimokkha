@@ -38,7 +38,7 @@ on the left page, the English on the facing right page, the two kept level passa
 | `--lang pali\|english\|both` | `both` | which language(s) to include |
 | `--notes` / `--no-notes` | on unless `pali` | the Preliminary Duties notes chapter |
 | `--instructions` / `--no-instructions` | on unless `pali` | English rubrics for group uposatha, pavāraṇā |
-| `--corrections` | off | substitute suggested readings for the book's apparent typos (see `{% sic %}`) |
+| `--corrections` / `--no-corrections` | on | substitute suggested readings for the book's apparent typos (see `{% sic %}`); `--no-corrections` prints the book's own |
 | `--paper a4,a5,booklet` | all three | which PDFs to make (comma-separated) |
 | `--columns` | off | bilingual A4/A5: Pāli and English in parallel columns |
 | `--signature N` | one booklet | split the booklet into folded gatherings of N pages (a multiple of 4) for sewing |

@@ -1,4 +1,21 @@
 // The custom-build form on the distribution page. DATA is embedded by src/site.ts.
+
+// Light or dark: the system's choice until the switch is used, then the switch's, remembered.
+(() => {
+  const root = document.documentElement;
+  const button = document.getElementById("theme");
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const current = () => root.dataset.theme ?? (system.matches ? "dark" : "light");
+  const label = () => { button.textContent = current() === "dark" ? "Light" : "Dark"; };
+  button.addEventListener("click", () => {
+    root.dataset.theme = current() === "dark" ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch {}
+    label();
+  });
+  system.addEventListener("change", label);
+  label();
+})();
+
 (() => {
   const form = document.getElementById("custom");
   const $ = (sel) => form.querySelector(sel);

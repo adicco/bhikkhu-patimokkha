@@ -144,8 +144,8 @@ if (!existsSync(dbPath)) {
 }
 
 // 6. Readings in the printed book that look like typos ({% sic %}). Builds show the book's
-// reading by default; `--corrections` substitutes the suggested reading.
-log(`\n## Book readings marked {% sic %} (shown as printed unless built with --corrections)`);
+// suggested reading by default; `--no-corrections` keeps the book's own.
+log(`\n## Book readings marked {% sic %} (corrected unless built with --no-corrections)`);
 for (const c of chapters) for (const n of c.ast.walk()) {
   if (n.type === "tag" && n.tag === "sic") {
     const printed = [...n.walk()].filter((t) => t.type === "text").map((t) => t.attributes.content).join("");

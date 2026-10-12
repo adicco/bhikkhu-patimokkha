@@ -79,7 +79,7 @@ describe("PDF", () => {
     for (const s of [
       "Tattha purimāni cattāri bhikkhūnaṁ vattaṁ jānantehi sāmaṇerehi-pi bhikkhūhi-pi",
       "The first four have been done by novices and bhikkhus",
-      "Ayaṁ vassānotu", "sattā ca uposathā ekā ca pavāraṇā",
+      "Ayaṁ vassānotu", "satta ca uposathā ekā ca pavāraṇā",
       "pañca ca uposathā ekā ca pavāraṇā atikkantā, eko uposatho avasiṭṭho", // note 5, rainy season, seventh
       "uposath’agge bārasa bhikkhū", "12 bhikkhus have gathered",
       "yathājja uposatho cātuddaso,", "as today is the fourteenth",

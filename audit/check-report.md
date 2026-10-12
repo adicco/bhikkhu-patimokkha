@@ -15,22 +15,18 @@
 - ok (only the expected Pāli letters and punctuation)
 
 ## Word-final "m" (expect ṁ unless sandhi before a vowel)
-- "dhāretabbam" in 15-pavarana.md
-- "yuttarūpam" in 15-pavarana.md
 - "Aham" in 15-pavarana.md
 
 ## Dictionary (DPD: /home/adicco/Downloads/dpd.db)
-- 5445 words (1779 distinct); 8 not resolved in DPD:
+- 5445 words (1775 distinct); 6 not resolved in DPD:
   - **anumānetabbo** — 01-pubba-kicca.md
   - **āsana-paññapanañ-ca** (unresolved: paññapanañ) — 01-pubba-kicca.md, 15-pavarana.md
-  - **muḷho’si** (unresolved: muḷho') — 04-parajika.md#parajika-2
   - **paṭikkarissāmi** — 15-pavarana.md
   - **pattakallattaṁ** — 01-pubba-kicca.md, 15-pavarana.md
   - **saṅgha-pavāraṇārahā** (unresolved: pavāraṇārahā) — 15-pavarana.md
-  - **Uppannunānaṁ** — 11-adhikarana-samatha.md
   - **veṭṭhita-sīsassa** (unresolved: veṭṭhita) — 10-sekhiya.md#sekhiya-66
 
-## Book readings marked {% sic %} (shown as printed unless built with --corrections)
+## Book readings marked {% sic %} (corrected unless built with --no-corrections)
 - 02-pubba-kicca-notes.md:22 printed **sattā** → suggested **satta**
 - 04-parajika.md:28 printed **muḷho'si** → suggested **mūḷho'si**
 - 05-sanghadisesa.md:141 printed **chanda-gamino** → suggested **chanda-gāmino**

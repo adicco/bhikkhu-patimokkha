@@ -22,7 +22,7 @@ export function showFor(lang: Lang, overrides: Partial<Show> = {}): Show {
     english,
     instructions: english,
     notes: english,
-    corrections: false,
+    corrections: true,
     ...overrides,
   };
 }
