@@ -3,8 +3,8 @@
  * bun run release [--skip-build] [--out dist/site] [--dist dist]   (--help for details)
  *
  * Builds every standard file (three languages × A4, A5, A5 booklet, EPUB, HTML, Markdown zip),
- * copies each into <out>/files/ under a name that carries its content hash
- * (Bhikkhu-Patimokkha.Pali.A4.3f9c2a1e0b.pdf), writes <out>/manifest.json and generates
+ * copies each into <out>/files/ under a name that carries a content hash shared by all of a
+ * language's formats (Bhikkhu-Patimokkha.Pali.A4.3f9c2a1e0b.pdf, …Pali.3f9c2a1e0b.epub), writes <out>/manifest.json and generates
  * <out>/index.html linking to those names. Hashed files can be cached forever; only
  * index.html and manifest.json change from one release to the next.
  *
@@ -14,7 +14,7 @@
 import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseCli } from "./cli";
-import { baseName, FORMATS, hashedName, hashFile, LANGS, zipMarkdown, type Kind } from "./artifacts";
+import { baseName, combinedHash, FORMATS, hashedName, hashFile, LANGS, zipMarkdown, type Kind } from "./artifacts";
 import { writeSite } from "./site";
 import type { Lang } from "./options";
 
@@ -70,14 +70,18 @@ const files: ManifestFile[] = [];
 for (const { lang } of LANGS) {
   const dir = join(dist, lang);
   const base = baseName(lang);
+  const built: { kind: Kind; path: string; sha256: string }[] = [];
   for (const f of FORMATS) {
     let path = join(dir, f.built(base));
     if (f.kind === "md") path = await zipMarkdown(dir, base, Number(epoch));
     try { statSync(path); } catch { console.warn(`missing ${path}; not listed`); continue; }
-    const { short, sha256 } = await hashFile(path);
-    const name = hashedName(path, short);
+    built.push({ kind: f.kind, path, sha256: (await hashFile(path)).sha256 });
+  }
+  const hash = combinedHash(built.map((b) => b.sha256));
+  for (const { kind, path, sha256 } of built) {
+    const name = hashedName(path, hash);
     copyFileSync(path, join(out, "files", name));
-    files.push({ lang, kind: f.kind, file: `files/${name}`, bytes: statSync(path).size, sha256 });
+    files.push({ lang, kind, file: `files/${name}`, bytes: statSync(path).size, sha256 });
   }
 }
 

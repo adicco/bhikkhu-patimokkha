@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { hashedName } from "../src/artifacts";
+import { combinedHash, hashedName } from "../src/artifacts";
 import { uposathaDays } from "../src/calendar";
 import { loadChapters, render } from "../src/load";
 import { NUMBERS, occasionErrors, reading, SEASON_TABLES, SLOT_NAMES, type Occasion } from "../src/occasion";
@@ -119,4 +119,11 @@ describe("calendar", () => {
 test("release file names carry the hash before the extension", () => {
   expect(hashedName("/x/Bhikkhu-Patimokkha.Pali.A4.pdf", "0123456789")).toBe("Bhikkhu-Patimokkha.Pali.A4.0123456789.pdf");
   expect(hashedName("Bhikkhu-Patimokkha.Pali.Markdown.zip", "abc")).toBe("Bhikkhu-Patimokkha.Pali.Markdown.abc.zip");
+});
+
+test("a language's formats share one hash that follows every file", () => {
+  const h = combinedHash(["a".repeat(64), "b".repeat(64)]);
+  expect(h).toMatch(/^[0-9a-f]{10}$/);
+  expect(combinedHash(["a".repeat(64), "b".repeat(64)])).toBe(h);
+  expect(combinedHash(["a".repeat(64), "c".repeat(64)])).not.toBe(h);
 });

@@ -10,7 +10,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium, type Browser, type Page } from "playwright-core";
-import { baseName, FORMATS, hashedName, LANGS } from "../src/artifacts";
+import { baseName, combinedHash, FORMATS, hashedName, LANGS } from "../src/artifacts";
 import type { Manifest, ManifestFile } from "../src/release";
 import { writeSite } from "../src/site";
 
@@ -33,10 +33,13 @@ export async function startSite(): Promise<Site> {
 
   const files: ManifestFile[] = [];
   for (const { lang } of LANGS) {
-    for (const f of FORMATS) {
+    const stand = FORMATS.map((f) => {
       const body = `stand-in for ${lang} ${f.kind}\n`;
-      const sha256 = new Bun.CryptoHasher("sha256").update(body).digest("hex");
-      const name = hashedName(f.built(baseName(lang)), sha256.slice(0, 10));
+      return { f, body, sha256: new Bun.CryptoHasher("sha256").update(body).digest("hex") };
+    });
+    const hash = combinedHash(stand.map((s) => s.sha256));
+    for (const { f, body, sha256 } of stand) {
+      const name = hashedName(f.built(baseName(lang)), hash);
       writeFileSync(join(site, "files", name), body);
       files.push({ lang, kind: f.kind, file: `files/${name}`, bytes: body.length, sha256 });
     }

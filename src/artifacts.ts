@@ -28,6 +28,14 @@ export async function hashFile(path: string) {
   return { short: sha256.slice(0, 10), sha256 };
 }
 
+/**
+ * One short hash for a set of files (a language's formats), from their SHA-256 digests in order,
+ * so the files share a name stem yet any change to any of them still changes it.
+ */
+export function combinedHash(sha256s: string[]) {
+  return new Bun.CryptoHasher("sha256").update(sha256s.join("\n")).digest("hex").slice(0, 10);
+}
+
 /** "x.A4.pdf" + hash → "x.A4.<hash>.pdf" */
 export function hashedName(file: string, hash: string) {
   const name = basename(file);

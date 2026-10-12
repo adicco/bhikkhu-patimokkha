@@ -82,8 +82,9 @@ bun run site         # regenerate dist/site/index.html alone from its manifest.j
 ```
 
 `release` builds the three languages in every format, zips the Markdown, and copies each file
-to `dist/site/files/` with its content hash in the name
-(`Bhikkhu-Patimokkha.Pali.A5.a545767bd6.pdf`). The index page links to those names, so they
+to `dist/site/files/` with a content hash in the name. A language's formats share one hash,
+taken over all of their contents (`Bhikkhu-Patimokkha.Pali.A5.a545767bd6.pdf`,
+`Bhikkhu-Patimokkha.Pali.a545767bd6.epub`), so it changes whenever any of them does. The index page links to those names, so they
 can be cached forever. Builds are reproducible (`SOURCE_DATE_EPOCH` defaults to the last
 commit's time, and the PDF and EPUB identifiers are derived from their source), so text that
 hasn't changed keeps its file names from one release to the next.
