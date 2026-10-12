@@ -10,4 +10,5 @@ export SOURCE_DATE_EPOCH GIT_COMMIT
 docker compose build
 docker compose up -d
 docker image prune -f >/dev/null
+docker builder prune -f --filter until=168h >/dev/null
 echo "deployed $GIT_COMMIT"
