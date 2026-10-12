@@ -430,7 +430,7 @@ describe("file options", () => {
     expect((await visible()).button).toBe("Build A4 PDF");
     await change(page, () => page.check(radio("lang", "pali")));
     expect(await visible()).toEqual({ paper: true, columns: false, size: true, signature: false, instructions: false, button: "Build A4 PDF" });
-    expect((await formState(page)).size).toBe("12");
+    expect((await formState(page)).size).toBe("13");
     await change(page, () => page.check(radio("lang", "english")));
     expect((await formState(page)).size).toBe("11");
     for (const [target, label] of [["epub", "EPUB"], ["html", "HTML"], ["md", "Markdown"]]) {

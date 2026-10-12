@@ -34,7 +34,7 @@ Output:
 
 PDF:
   --paper a4,a5,booklet         paper sizes to make (default: all three)
-  --size PT                     font size in points, e.g. 13 or 10.5 (default: 12 for pali, else 11)
+  --size PT                     font size in points, e.g. 13 or 10.5 (default: 13 for pali, else 11)
   --columns                     bilingual A4/A5 side by side instead of stacked
   --signature N                 split the booklet into gatherings of N pages (multiple of 4)
 
@@ -103,7 +103,7 @@ for (const [k, choices] of Object.entries(OCCASION_CHOICES)) {
   if (v !== undefined) oneOf(`--${k}`, v, choices);
 }
 const papers = new Set((values.paper ?? "a4,a5,booklet").split(",").map((p) => oneOf("--paper", p.trim().toLowerCase(), ["a4", "a5", "booklet"])));
-const fontSize = values.size === undefined ? (lang === "pali" ? 12 : 11) : Number(values.size);
+const fontSize = values.size === undefined ? (lang === "pali" ? 13 : 11) : Number(values.size);
 if (!(fontSize >= 6 && fontSize <= 30)) fail(`--size must be a font size in points from 6 to 30, not '${values.size}'`);
 const sig = values.signature === undefined ? 0 : count("signature", values.signature);
 if (sig % 4) fail(`--signature must be a multiple of 4, not ${sig}`);

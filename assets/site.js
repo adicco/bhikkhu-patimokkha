@@ -292,7 +292,7 @@
     // customised (Pāli only drops the notes). A chapter chosen by hand is kept otherwise.
     if (value("ceremony") !== lastCeremony || (name === "lang" && !customised)) presetChapters();
     lastCeremony = value("ceremony");
-    if (name === "lang") set("size", value("lang") === "pali" ? 12 : 11);
+    if (name === "lang") set("size", value("lang") === "pali" ? 13 : 11);
     sync();
     later();
   });

@@ -1,15 +1,16 @@
 #!/usr/bin/env bun
 /**
- * bun run publish [--skip-build] [--notes FILE] [--tag vYYYY.MM.DD] [--draft] [--force] [--dry-run]   (--help for details)
+ * bun run publish [--skip-build] [--notes FILE] [--tag vYYYY.MM.DD.N] [--draft] [--force] [--dry-run]   (--help for details)
  *
  * Publishes the release files (dist/site/files/, from `bun run release`) and manifest.json as a
  * GitHub release on the commit they were built from. The notes open with what changed: --notes FILE
  * if given, else the "## Unreleased" section of CHANGELOG.md, else the commit messages since the
  * last release. A downloads table follows. After publishing, the Unreleased heading becomes the
  * release's tag and date (with a fresh empty Unreleased above it), committed and pushed.
- * Needs the gh CLI, logged in. The tag defaults to the text's date (v2026.10.12, then
- * v2026.10.12.2, … if that is taken). If the latest release already has exactly these files,
- * nothing is published unless --force: the hashed names change only when the text does.
+ * Needs the gh CLI, logged in. The tag defaults to the text's date and that day's release number
+ * (v2026.10.12.1, v2026.10.12.2, …), counting on from CHANGELOG.md's headings, the releases and the
+ * tags. If the latest release already has exactly these files, nothing is published unless
+ * --force: the hashed names change only when the text does.
  * The release is made as a draft, the files uploaded one by one, then the draft published; each
  * GitHub call is retried on 5xx/network errors and traced to dist/publish.log (GH_DEBUG=api,
  * token redacted). If a run still fails, the draft stays: rerun with --skip-build to resume it.
@@ -32,7 +33,8 @@ Builds the release (bun run release) and publishes its files as a GitHub release
   --site DIR      the release site to publish (default: dist/site)
   --notes FILE    what changed, in Markdown (default: CHANGELOG.md's Unreleased section,
                   or the commit messages since the last release)
-  --tag TAG       the release tag (default: v<YYYY.MM.DD> of the text's date)
+  --tag TAG       the release tag (default: v<YYYY.MM.DD>.N of the text's date, N counting
+                  that day's releases from 1)
   --draft         create the release as a draft
   --force         publish even if the latest release has the same files
   -y, --yes       use the commit messages as the notes without asking, when there is no
@@ -136,9 +138,18 @@ if (fallback) {
 if (intro) intro += "\n\n";
 
 const date = manifest.sourceDate.slice(0, 10);
-let tag = values.tag ?? `v${date.replace(/-/g, ".")}`;
-if (!values.tag) for (let n = 2; taken(tag) || run(["git", "rev-parse", "-q", "--verify", `refs/tags/${tag}`], { ok: true }); n++) tag = `v${date.replace(/-/g, ".")}.${n}`;
-else if (taken(tag)) fail(`a release tagged ${tag} already exists`);
+// Default tag v<date>.N, numbering a day's releases from .1: N is one past the highest number that
+// day already has in a CHANGELOG.md heading, a published release or a git tag (a bare v<date>
+// counts as .0). A draft's tag isn't counted, so its draft is resumed.
+const day = `v${date.replace(/-/g, ".")}`;
+const numberOf = (t: string) => (t === day ? 0 : t.startsWith(`${day}.`) && /^\d+$/.test(t.slice(day.length + 1)) ? Number(t.slice(day.length + 1)) : -1);
+const used = [
+  ...[...(changelog ?? "").matchAll(/^## (v\S+)/gm)].map((m) => m[1]!),
+  ...releases.filter((r) => !r.isDraft).map((r) => r.tagName),
+  ...(run(["git", "tag", "--list", `${day}*`]) ?? "").split("\n"),
+].map(numberOf);
+let tag = values.tag ?? `${day}.${Math.max(0, ...used) + 1}`;
+if (values.tag && taken(tag)) fail(`a release tagged ${tag} already exists`);
 const resuming = releases.some((r) => r.tagName === tag && r.isDraft);
 
 const size = (bytes: number) => (bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1e3))} KB`);

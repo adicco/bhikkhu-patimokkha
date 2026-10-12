@@ -42,7 +42,7 @@ on the left page, the English on the facing right page, the two kept level passa
 | `--paper a4,a5,booklet` | all three | which PDFs to make (comma-separated) |
 | `--columns` | off | bilingual A4/A5: Pāli and English in parallel columns |
 | `--signature N` | one booklet | split the booklet into folded gatherings of N pages (a multiple of 4) for sewing |
-| `--size N` | 12pt Pāli, 11pt otherwise | PDF font size |
+| `--size N` | 13pt Pāli, 11pt otherwise | PDF font size |
 | `--chapters slug,…` | all | only these chapters (slugs from the front matter, e.g. `pubba-kicca,nidana`) |
 
 Requires Bun, pandoc (EPUB) and LuaLaTeX with Gentium Plus (PDF).
