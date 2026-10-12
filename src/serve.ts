@@ -170,7 +170,7 @@ function admit(ip: string) {
   const now = Date.now();
   const recent = (started.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW);
   if (RATE_LIMIT > 0 && recent.length >= RATE_LIMIT) {
-    const minutes = Math.ceil((recent[0] + RATE_WINDOW - now) / 60_000);
+    const minutes = Math.ceil((recent[0]! + RATE_WINDOW - now) / 60_000);
     throw new HttpError(429, `Too many custom builds from your address. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`);
   }
   recent.push(now);
@@ -294,7 +294,7 @@ const server = Bun.serve({
       if (pathname === "/api/build" && r.method === "POST") {
         const { req, args, errors } = parse(await readBody(r));
         if (errors.length || !req) return json({ error: errors.join("; ") }, 400);
-        const ip = (IP_HEADER && r.headers.get(IP_HEADER)?.split(",")[0].trim()) || server.requestIP(r)?.address || "unknown";
+        const ip = (IP_HEADER && r.headers.get(IP_HEADER)?.split(",")[0]?.trim()) || server.requestIP(r)?.address || "unknown";
         const path = await build(req, args, ip);
         const name = path.split(sep).pop()!;
         return new Response(Bun.file(path), {

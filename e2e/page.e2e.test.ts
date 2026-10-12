@@ -1,3 +1,4 @@
+/// <reference lib="dom" />  // for the code that page.evaluate runs in the browser
 /**
  * The distribution page in a browser: downloads, the occasion form, the preview, chapters and
  * file options, and the server's API. Expected Pāli is typed from the book's notes, not taken

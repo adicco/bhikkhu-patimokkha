@@ -1,3 +1,4 @@
+/// <reference lib="dom" />  // for the code that page.evaluate runs in the browser
 /**
  * End-to-end harness: a site generated for a fixed date, the real server on a free port, and a
  * headless Chromium (playwright-core; `bunx playwright-core install chromium-headless-shell` once,
