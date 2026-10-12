@@ -6,8 +6,10 @@ tag. Left empty, the notes list the commit messages since the last release.
 
 ## Unreleased
 
-## v2026.10.12 (12 October 2026)
+## v2026.10.12.1 (12 October 2026)
 
-**v1.1**: Text corrections from a comparison with the Sasanarakkha Thai Dhammayut text: Saṅghādisesa 5 *itthī-matiṁ*, Saṅghādisesa 12 *saṁvaḍḍhā*; Notes 4 keeps the book's "uposathās" as a marked misprint.
+**v1.1**: Text corrections from a comparison with the Sasanarakkha Thai Dhammayut text: Saṅghādisesa 5 _itthī-matiṁ_, Saṅghādisesa 12 _saṁvaḍḍhā_; Notes 4 keeps the book's "uposathās" as a marked misprint.
+
+## v2026.10.12.0 (12 October 2026)
 
 **v1.0**: Multiple builds and setting up GitHub Releases
