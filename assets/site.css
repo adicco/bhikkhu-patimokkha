@@ -1,0 +1,205 @@
+/* The distribution page (dist/site/index.html). The book's own styles are in style.css. */
+@font-face { font-family: "Gentium Plus"; src: url(REGULAR) format("woff2"), local("Gentium Plus"); font-style: normal; font-display: swap; }
+@font-face { font-family: "Gentium Plus"; src: url(ITALIC) format("woff2"), local("Gentium Plus Italic"); font-style: italic; font-display: swap; }
+
+:root {
+  --leaf: #ECEEE6;      /* palm leaf in shade: the page */
+  --leaf-lit: #F7F8F3;  /* the preview, a page held to the light */
+  --ink: #1F261D;       /* lampblack */
+  --stylus: #556052;    /* secondary text */
+  --dye: #7A4E0F;       /* jackfruit-wood dye: whatever changes with the occasion, and the one action */
+  --rule: #C7CEBF;
+  --lamp: #F2D38A;      /* a reading lights up when it changes */
+  --dye-press: #64400C; /* the action under the pointer */
+  --fault: #8E2A1B;     /* a build that can't go ahead */
+  --measure: 34em;
+  font-size: 118.75%;   /* 19px: Gentium's small x-height wants it */
+  color-scheme: light dark;
+}
+
+/* The same leaf by lamplight. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --leaf: #161A15;
+    --leaf-lit: #1F241D;
+    --ink: #E2E6DA;
+    --stylus: #9BA596;
+    --dye: #D9A65A;
+    --rule: #3A4237;
+    --lamp: #6B5220;
+    --dye-press: #E8BD7C;
+    --fault: #E8907B;
+  }
+}
+
+* { box-sizing: border-box; }
+html { background: var(--leaf); color: var(--ink); }
+body {
+  margin: 0 auto;
+  max-width: 76rem;
+  padding: 3.5rem clamp(1.1rem, 4vw, 3rem) 4rem;
+  font-family: "Gentium Plus", "Gentium Book Plus", Gentium, serif;
+  line-height: 1.5;
+  font-variant-numeric: oldstyle-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+i, em { font-style: italic; }
+a { color: var(--dye); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--dye); outline-offset: 3px; border-radius: 2px; }
+
+/* Masthead: the title in the book's face, large; one sentence of what this is. */
+.masthead { margin-bottom: 3.5rem; }
+h1 {
+  font-weight: normal;
+  font-size: clamp(2.6rem, 7vw, 4.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  margin: 0 0 1.1rem;
+}
+.lede { font-size: 1.2rem; line-height: 1.45; margin: 0; max-width: 30em; }
+
+h2 { font-weight: normal; font-size: 1.6rem; line-height: 1.2; margin: 0 0 1rem; }
+h3 { font-weight: normal; font-style: italic; font-size: 1rem; color: var(--stylus); margin: 0 0 1rem; }
+section + section { margin-top: 4.5rem; padding-top: 2.5rem; border-top: 1px solid var(--rule); }
+
+/* Downloads: a real table, languages down, formats across. */
+.table-wrap { max-width: 52rem; }
+table.downloads { border-collapse: collapse; width: 100%; font-variant-numeric: lining-nums tabular-nums; }
+.downloads thead th { font-weight: normal; font-style: italic; color: var(--stylus); text-align: right; padding: 0 0 0.5rem 1rem; white-space: nowrap; }
+.downloads tbody th { font-weight: normal; text-align: left; padding: 0.7rem 1rem 0.7rem 0; white-space: nowrap; }
+.downloads td { text-align: right; padding: 0.7rem 0 0.7rem 1rem; white-space: nowrap; }
+.downloads tbody tr { border-top: 1px solid var(--rule); }
+.downloads tbody tr:last-child { border-bottom: 1px solid var(--rule); }
+.downloads td a { display: inline-block; padding: 0.1rem 0; }
+.downloads td.none { color: var(--stylus); font-style: italic; }
+.aside { max-width: var(--measure); color: var(--stylus); font-size: 0.9rem; margin: 1rem 0 0; }
+
+.intro { max-width: var(--measure); margin: 0 0 2.5rem; }
+
+/* The form: occasion choices on the left, the passage as it will be recited on the right. */
+form {
+  display: grid;
+  grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr);
+  grid-template-areas: "occasion preview" "file preview";
+  column-gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+.occasion { grid-area: occasion; }
+.file { grid-area: file; }
+.preview { grid-area: preview; position: sticky; top: 1.5rem; }
+
+fieldset { border: 0; margin: 0 0 1.6rem; padding: 0; min-width: 0; }
+legend { font-style: italic; font-size: 1.15rem; padding: 0; margin-bottom: 0.5rem; }
+.label { margin: 0.7rem 0 0.2rem; color: var(--stylus); font-size: 0.92rem; }
+.choices { margin-bottom: 0.3rem; }
+.choice { display: flex; gap: 0.55rem; align-items: baseline; padding: 0.18rem 0; cursor: pointer; }
+.choice input { flex: none; accent-color: var(--dye); width: 1rem; height: 1rem; margin: 0; transform: translateY(0.12rem); }
+.row { display: flex; flex-wrap: wrap; column-gap: 1.2rem; align-items: baseline; }
+.row .label { flex-basis: 100%; }
+.field { display: grid; gap: 0.2rem; margin: 0.4rem 0 0.6rem; }
+.field > span { color: var(--stylus); font-size: 0.92rem; }
+.fields { display: flex; flex-wrap: wrap; column-gap: 1.5rem; }
+select {
+  font: inherit; color: var(--ink); background: var(--leaf-lit);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 0.35rem 0.5rem; max-width: 100%;
+}
+select:hover { border-color: var(--stylus); }
+.date-row { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.date-row select { min-width: 0; }
+.badge {
+  flex: none; color: var(--dye); border: 1px solid currentColor; border-radius: 3px;
+  padding: 0.05rem 0.4rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.hint { font-size: 0.88rem; color: var(--stylus); margin: 0.3rem 0 0; }
+[hidden] { display: none !important; }
+
+/* The legend floats into the fieldset's flow so that Reset can share its line. */
+.chapter-set { position: relative; }
+.chapter-set legend { float: left; width: 100%; }
+.chapter-set .hint { clear: both; margin: 0 0 0.5rem; }
+.chapters { columns: 2 12rem; column-gap: 1.5rem; }
+.chapters .choice { break-inside: avoid; }
+/* A chapter's name builds it alone: set like the label it replaces. */
+button.solo {
+  font: inherit; font-size: 1rem; color: inherit; background: none; border: 0; border-radius: 2px;
+  padding: 0; text-align: left; cursor: pointer;
+}
+button.solo:hover { background: none; text-decoration: underline dotted var(--stylus); text-underline-offset: 0.2em; }
+/* Reset sits at the far end of the Chapters legend's line. */
+button.quiet {
+  position: absolute; top: 0.05rem; right: 0;
+  font: inherit; font-size: 0.92rem; color: var(--dye); background: none;
+  border: 1px solid var(--rule); border-radius: 3px; padding: 0.1rem 0.6rem;
+}
+button.quiet:hover { background: var(--leaf-lit); border-color: var(--dye); }
+
+.actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.2rem; margin-top: 0.6rem; }
+button {
+  font: inherit; font-size: 1.05rem; color: var(--leaf-lit); background: var(--dye);
+  border: 0; border-radius: 3px; padding: 0.6rem 1.3rem; cursor: pointer;
+}
+button:hover { background: var(--dye-press); }
+button:disabled { background: var(--stylus); cursor: progress; }
+#status { margin: 0; font-size: 0.95rem; }
+#status.error { color: var(--fault); }
+.cli { margin-top: 1.4rem; font-size: 0.9rem; color: var(--stylus); }
+.cli summary { cursor: pointer; }
+.cli pre { white-space: pre-wrap; word-break: break-all; background: var(--leaf-lit); padding: 0.8rem 1rem; border-radius: 3px; }
+.cli code { font-family: ui-monospace, "DejaVu Sans Mono", monospace; font-size: 0.8rem; color: var(--ink); }
+
+/* The preview: set like a page of the book, held to the light. */
+.preview { background: var(--leaf-lit); padding: clamp(1.4rem, 3vw, 2.4rem); border-radius: 2px; }
+#preview { font-size: calc(1.32rem * var(--scale, 1)); line-height: 1.55; hyphens: manual; }
+#preview .passage + .passage { margin-top: 1.4rem; }
+#preview .empty { color: var(--stylus); font-style: italic; }
+#preview p { margin: 0 0 0.35rem; }
+#preview .lines p { margin-left: 1.5em; }
+/* English as each PDF layout sets it (src/writers/latex.ts): stacked is small and grey,
+   columns small, the booklet's facing page and an English-only build full size. */
+#preview .english { font-size: 0.8em; line-height: 1.5; color: var(--stylus); margin: 0.2rem 0 0; }
+#preview[data-layout="columns"] .english { color: var(--ink); }
+#preview[data-layout="facing"] .english,
+#preview[data-layout="single"] .english { font-size: 1em; line-height: 1.55; color: var(--ink); margin: 0; }
+#preview[data-layout="columns"] .passage:has(> .english),
+#preview[data-layout="facing"] .passage:has(> .english) {
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4em; align-items: start;
+}
+#preview[data-layout="columns"] .english { margin: 0; }
+#preview .english p { margin: 0 0 0.25rem; }
+#preview .numbered { display: none; }
+#preview .var { font-style: italic; }
+#preview .slot { color: var(--dye); border-radius: 2px; transition: background-color 1.6s ease-out; }
+#preview .slot.lit { background: var(--lamp); transition: none; }
+#preview .slot.unglossed { color: inherit; text-decoration: underline dotted var(--stylus); text-underline-offset: 0.2em; }
+#preview .changed { font-variant: small-caps; letter-spacing: 0.03em; }
+#preview .sic { text-decoration: underline dotted var(--dye); text-underline-offset: 0.2em; }
+.key { font-size: 0.85rem; color: var(--stylus); margin: 1.4rem 0 0; }
+.key .sample { text-decoration: underline dotted var(--stylus); text-underline-offset: 0.2em; }
+
+footer { margin-top: 5rem; max-width: var(--measure); font-size: 0.88rem; color: var(--stylus); }
+
+@media (max-width: 62rem) {
+  form { grid-template-columns: minmax(0, 1fr); grid-template-areas: "occasion" "preview" "file"; }
+  .preview { position: static; margin-bottom: 2.5rem; }
+  #preview { font-size: calc(1.15rem * var(--scale, 1)); }
+}
+
+/* On a phone the table becomes one block per language. */
+@media (max-width: 40rem) {
+  body { padding-top: 2.2rem; }
+  table.downloads, .downloads tbody, .downloads tr, .downloads th { display: block; }
+  .downloads thead { display: none; }
+  .downloads tbody tr { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1rem; padding: 0.6rem 0 0.8rem; }
+  .downloads tbody th { grid-column: 1 / -1; padding: 0 0 0.3rem; font-size: 1.1rem; }
+  .downloads td { display: flex; justify-content: space-between; padding: 0.25rem 0; }
+  .downloads td::before { content: attr(data-label); color: var(--stylus); }
+  /* Too narrow for side-by-side Pāli and English: one under the other, as set. */
+  #preview .passage:has(> .english) { display: block !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #preview .slot, #preview .slot.lit { transition: none; }
+  #preview .slot.lit { background: none; }
+}

@@ -16,10 +16,21 @@ export interface LatexOptions {
   title: string;
   paper: "a4" | "a5";
   fontSize: number;
+  /**
+   * How bilingual passages are set:
+   * - stacked: the English under the Pāli, smaller and grey (default)
+   * - columns: Pāli and English side by side
+   * - facing:  Pāli on the left page, English on the facing right page, as in the printed book
+   */
+  layout?: "stacked" | "columns" | "facing";
 }
 
 export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): string {
   const both = show.pali && show.english;
+  const layout = both ? opts.layout ?? "stacked" : "stacked";
+  /** True while typesetting the facing-pages (paracol) part of the book. */
+  let open = false;
+  const english = (s: string) => `{\\englishcolor ${s}}`;
 
   function inline(n: RenderableTreeNode): string {
     if (typeof n === "string") return esc(n);
@@ -42,8 +53,8 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
   }
 
   const pair = (n: Tag, sep: string) => {
-    const { pali, english } = languages(n);
-    return [pali, english].filter(Boolean).map((t) => inline(t!)).join(sep);
+    const { pali, english: en } = languages(n);
+    return [pali && inline(pali), en && english(inline(en))].filter(Boolean).join(sep);
   };
 
   function blocks(nodes: RenderableTreeNode[]): string {
@@ -59,10 +70,20 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
     if (!Tag.isTag(n)) return "";
     const kids = n.children;
     if (/^h[1-6]$/.test(n.name)) {
-      const parts = tags(kids).map((k) => inline(k));
+      const parts = tags(kids).map((k) => (cls(k, "english") ? english(inline(k)) : inline(k)));
       const level = Number(n.name[1]);
+      if (open) {
+        // Each page gets its own language; a heading given once goes on both pages.
+        const h = (t: string) => (level <= 2 ? `\\heading{${t}}` : `\\subheading{${t}}`);
+        return `\\switchcolumn[0]*\n${h(parts[0]!)}\n\\switchcolumn[1]\n${h(parts[1] ?? parts[0]!)}`;
+      }
       if (level <= 2) return `\\heading{${parts.join("\\\\[2pt]\\normalsize ")}}`;
       return `\\subheading{${parts.join(" \\textperiodcentered{} ")}}`;
+    }
+    if (open && (cls(n, "response") || cls(n, "rubric") || cls(n, "vagga"))) {
+      const { pali, english: en } = languages(n);
+      const fmt = (t: Tag) => (cls(n, "vagga") ? inline(t) : `\\textit{(\\,${inline(t)}\\,)}`);
+      return `\\switchcolumn[0]*\n${pali ? centered(fmt(pali)) : ""}\n\\switchcolumn[1]\n${en ? centered(fmt(en)) : ""}`;
     }
     if (cls(n, "response") || cls(n, "rubric")) return centered(`\\textit{(\\,${pair(n, "\\,)}\\\\\\textit{(\\,")}\\,)}`);
     if (cls(n, "vagga")) return centered(pair(n, "\\\\"));
@@ -74,6 +95,7 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
     }
     if (cls(n, "lines")) return `\\begin{lines}${n.attributes.class.includes("indented") ? "[3em]" : ""}\n${blocks(kids)}\n\\end{lines}`;
     if (cls(n, "stanza")) return `\\begin{stanza}\n${blocks(kids)}\n\\end{stanza}`;
+    if (cls(n, "colophon")) return `{\\small\\setlength{\\parindent}{0pt}\n${blocks(kids)}\\par}`;
     if (cls(n, "instruction")) return `{\\itshape\n${blocks(kids)}\\par}`;
     if (cls(n, "note")) {
       return `\\begin{notepara}{${n.attributes["data-label"]}}\n${blocks(kids)}\n\\end{notepara}`;
@@ -85,30 +107,62 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
       const speaker = n.attributes["data-speaker"] ? `\\noindent\\textit{${esc(n.attributes["data-speaker"])}:}\\par\n` : "";
       const center = cls(n, "align-center");
       const { pali, english } = languages(n);
-      if (both && pali && english) {
+      const wrap = (s: string) => (center ? centered(s) : s);
+      if (open && pali && english) {
+        // Left and right pages stay in step at every passage (paracol's synchronised switch).
+        return `\\switchcolumn[0]*\n${speaker}${wrap(blocks(pali.children))}\n\\switchcolumn[1]\n${speaker}${wrap(blocks(english.children))}`;
+      }
+      if (layout === "columns" && pali && english) {
         // Columns stay in step at every passage (paracol's synchronised switch).
-        const wrap = (s: string) => (center ? centered(s) : s);
         return `\\begin{paracol}{2}\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker}${wrap(blocks(pali.children))}\n\\switchcolumn\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker ? "\\mbox{}\\par\n" : ""}{\\englishfont\n${wrap(blocks(english.children))}\\par}\n\\end{paracol}`;
       }
       const body = speaker + blocks(kids);
-      return center ? centered(body) : body;
+      if (open) return `\\switchcolumn[${english ? 1 : 0}]*\n${wrap(body)}`;
+      return wrap(body);
     }
-    if (cls(n, "english") && both) return `{\\englishfont\n${blocks(kids)}\\par}`;
+    if (cls(n, "english") && both) {
+      // Stacked: the English follows its Pāli, set off by a little space.
+      const gap = layout === "stacked" ? "\\par\\vspace{0.15em}" : "";
+      return `${gap}{\\englishfont\n${blocks(kids)}\\par}`;
+    }
     return blocks(kids);
   }
 
-  const body = chapters.map(({ chapter, tree }) => {
-    const brk = RUN_ON.has(chapter.slug) ? "\\bigskip" : "\\clearpage";
-    return `% ---- ${chapter.file}\n${brk}\n\\phantomsection\\addcontentsline{toc}{section}{${esc(chapter.title)}}\n${blocks(tree.children)}`;
-  }).join("\n\n");
+  /** Top level of a facing-pages chapter: pairs split themselves across the pages; English-only
+   *  instructions go on the right page, anything else (e.g. a note with a Pāli variant) on the left. */
+  function facingBlocks(nodes: RenderableTreeNode[]): string {
+    const split = ["passage", "heading", "response", "rubric", "vagga"];
+    return nodes.map((n) => {
+      const out = block(n);
+      if (!out.trim() || split.some((c) => cls(n, c))) return out;
+      return `\\switchcolumn[${cls(n, "instruction") ? 1 : 0}]*\n${out}`;
+    }).filter((s) => s.trim()).join("\n\n");
+  }
+
+  // Facing pages: the bilingual chapters go in a parallel-paging paracol (column 0 on the
+  // left/even pages, column 1 on the right/odd pages). Front matter and notes stay single-page.
+  const isFacing = (c: Rendered) => layout === "facing" && c.chapter.slug !== "front" && c.chapter.kind !== "notes";
+  const body = chapters.map((c) => {
+    const { chapter, tree } = c;
+    let brk = RUN_ON.has(chapter.slug) ? "\\bigskip" : "\\clearpage";
+    if (isFacing(c) && !open) { open = true; brk = "\\clearpage\\ifodd\\value{page}\\hbox{}\\newpage\\fi\n\\begin{paracol}[1]*{2}"; }
+    else if (!isFacing(c) && open) { open = false; brk = `\\end{paracol}\n${brk}`; }
+    else if (open) brk = `\\switchcolumn[0]*${brk}`;
+    const content = open ? facingBlocks(tree.children) : blocks(tree.children);
+    return `% ---- ${chapter.file}\n${brk}\n\\phantomsection\\addcontentsline{toc}{section}{${esc(chapter.title)}}\n${content}`;
+  }).join("\n\n") + (open ? "\n\\end{paracol}" : "");
 
   const geometry = opts.paper === "a5"
     ? "a5paper,inner=18mm,outer=14mm,top=16mm,bottom=18mm"
     : "a4paper,inner=25mm,outer=20mm,top=20mm,bottom=22mm";
 
-  return String.raw`\documentclass[${opts.fontSize}pt,twoside]{article}
-\usepackage[${geometry}]{geometry}
+  // article itself only knows 10, 11 and 12pt and silently falls back to 10pt for anything else;
+  // other sizes go through the fontsize package, which scales \small, \large etc. to match.
+  const classSize = [10, 11, 12].includes(opts.fontSize);
+  return String.raw`\documentclass[${classSize ? `${opts.fontSize}pt,` : ""}twoside]{article}
+${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usepackage[${geometry}]{geometry}
 \usepackage{fontspec}
+\usepackage{xcolor}
 \setmainfont{Gentium Plus}
 \usepackage{microtype}
 \usepackage{paracol}
@@ -124,7 +178,8 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
 \linespread{1.08}
 \sloppy\emergencystretch=3em
 \setlist{nosep,leftmargin=2.2em}
-\newcommand{\englishfont}{\small}
+\newcommand{\englishcolor}{${layout === "stacked" ? "\\color{black!60}" : ""}}
+\newcommand{\englishfont}{${layout === "facing" ? "" : "\\small"}\englishcolor}
 \newcommand{\heading}[1]{\par\bigskip{\centering\large\scshape #1\par}\nopagebreak\medskip}
 \newcommand{\subheading}[1]{\par\medskip{\centering\itshape #1\par}\nopagebreak\smallskip}
 \newenvironment{lines}[1][1.5em]{\par\begingroup\setlength{\parindent}{0pt}\setlength{\leftskip}{#1}\raggedright}{\par\endgroup}

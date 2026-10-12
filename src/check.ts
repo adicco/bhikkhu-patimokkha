@@ -52,7 +52,7 @@ for (const { chapter, tree } of render(chapters, show)) {
   const visit = (n: RenderableTreeNode, where: string) => {
     if (typeof n === "string") { runs.push({ where, text: n }); return; }
     if (!Tag.isTag(n)) return;
-    if (n.name === "sup" || n.attributes.class === "num") return;
+    if (n.name === "sup" || n.attributes.class === "num" || n.attributes.lang === "en") return;
     const id = n.attributes.id ? `${chapter.file}#${n.attributes.id}` : where;
     n.children.forEach((c) => visit(c, id));
   };

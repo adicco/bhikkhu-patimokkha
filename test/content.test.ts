@@ -51,6 +51,13 @@ describe("builds", () => {
     expect(both).toContain("> **1.** A deliberate lie is to be confessed.");
   });
 
+  test("a quotation that opens a paragraph opens with “", () => {
+    const en = md("english");
+    expect(en).toContain("“Venerable sirs, may the Community listen to me.");
+    expect(en).toContain("“Friends, I invite the Community.");
+    expect(en).not.toMatch(/^(> )?”/m);
+  });
+
   test("book readings are kept unless corrections are requested", () => {
     expect(md("pali")).toContain("muḷho’si");
     expect(md("pali", { corrections: true })).toContain("mūḷho’si");

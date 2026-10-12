@@ -1,0 +1,24 @@
+# docker compose up -d --build   (or scripts/deploy.sh, which also sets the build arguments)
+# Listens on 127.0.0.1:3000; put a TLS-terminating proxy (Caddy, nginx) in front of it.
+services:
+  patimokkha:
+    build:
+      context: .
+      args:
+        SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH:-}
+        GIT_COMMIT: ${GIT_COMMIT:-}
+    image: patimokkha
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      BUILD_CONCURRENCY: "1"   # LaTeX is CPU-bound; raise with the VPS's cores
+      BUILD_QUEUE: "8"
+      BUILD_TIMEOUT: "180"
+    volumes:
+      - build-cache:/app/dist/cache
+    cpus: 2
+    mem_limit: 2g
+
+volumes:
+  build-cache:

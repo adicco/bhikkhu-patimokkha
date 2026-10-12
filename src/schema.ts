@@ -1,7 +1,11 @@
 import Markdoc, { Tag, type Config, type Node, type RenderableTreeNode, type Schema } from "@markdoc/markdoc";
 import type { Show } from "./options";
+import { reading, type Lang, type Occasion } from "./occasion";
 
 const show = (config: Config): Show => config.variables?.show as Show;
+const occasion = (config: Config): Occasion => (config.variables?.occasion ?? {}) as Occasion;
+/** The language of the block being transformed (set by the pali/english/instruction tags). */
+const langOf = (config: Config): Lang => (config.variables?.lang ?? "en") as Lang;
 
 const children = (node: Node, config: Config) => node.transformChildren(config);
 
@@ -9,9 +13,20 @@ const children = (node: Node, config: Config) => node.transformChildren(config);
 const gated = (flag: keyof Show, name: string, cls: string, extra: Record<string, unknown> = {}): Schema => ({
   transform(node, config) {
     if (!show(config)[flag]) return null;
-    return new Tag(name, { class: cls, ...extra }, children(node, config));
+    const inner = extra.lang ? { ...config, variables: { ...config.variables, lang: extra.lang } } : config;
+    return new Tag(name, { class: cls, ...extra }, children(node, inner));
   },
 });
+
+/** Inline Markdoc source (a reading from the notes) transformed with the current config. */
+function inlineSource(source: string, config: Config): RenderableTreeNode[] {
+  const tree = Markdoc.transform(Markdoc.parse(source), config);
+  const p = Tag.isTag(tree) ? tree.children.find((c) => Tag.isTag(c) && c.name === "p") : undefined;
+  return Tag.isTag(p) ? p.children : [];
+}
+
+/** Readings named after the occasion's choice (bhante="…" avuso="…"), for the bracketed alternatives. */
+const SLOT_FIELDS: Record<string, keyof Occasion> = { day: "day", address: "address", statements: "statements" };
 
 /** Wraps a pair of strings (pali / english attributes) in language spans. */
 function pair(attrs: Record<string, any>, config: Config): RenderableTreeNode[] {
@@ -54,8 +69,8 @@ export const tags: Record<string, Schema> = {
       if (!kids.length) return null;
       return new Tag("div", {
         class: ["passage", a.align && `align-${a.align}`, a.kind].filter(Boolean).join(" "),
-        id: a.id,
-        "data-speaker": a.speaker,
+        ...(a.id && { id: a.id }),
+        ...(a.speaker && { "data-speaker": a.speaker }),
       }, kids);
     },
   },
@@ -187,8 +202,37 @@ export const tags: Record<string, Schema> = {
       return new Tag("div", { class: "season-table" }, [new Tag("p", { class: "table-title" }, [a.title]), ...children(node, config)]);
     },
   },
+  /**
+   * Text that changes with the occasion (see src/occasion.ts). Unset, it prints as in the book.
+   * English with no reading in the book for the chosen occasion keeps the printed English and is
+   * marked "unglossed".
+   */
+  slot: {
+    inline: true,
+    attributes: Object.fromEntries(["name", "fifteenth", "fourteenth", "harmony", "bhante", "avuso", "three", "two", "one"]
+      .map((k) => [k, { type: String, required: k === "name" }])),
+    transform(node, config) {
+      const a = node.transformAttributes(config);
+      const o = occasion(config);
+      const field = SLOT_FIELDS[a.name];
+      let r;
+      if (field) {
+        const v = o[field] as string | undefined;
+        r = { changed: v !== undefined, source: v !== undefined ? a[v] : undefined };
+      } else {
+        r = reading(a.name, langOf(config), o);
+      }
+      const unglossed = r.changed && r.source === undefined && langOf(config) === "en";
+      const attrs: Record<string, string> = { class: unglossed ? "slot unglossed" : "slot", "data-slot": a.name };
+      if (r.changed) attrs["data-set"] = "";
+      return new Tag("span", attrs,
+        r.source !== undefined ? inlineSource(r.source, config) : children(node, config));
+    },
+  },
+
   numbers: { transform: (node, config) => new Tag("div", { class: "numbers" }, children(node, config)) },
-  colophon: gated("english", "div", "colophon"),
+  // The source attribution is shown in every build, Pāli-only included.
+  colophon: { render: "div", attributes: { class: { type: String, default: "colophon" }, lang: { type: String, default: "en" } } },
   signature: { transform: (node, config) => new Tag("div", { class: "signature" }, children(node, config)) },
   epigraph: {
     attributes: { source: { type: String } },
@@ -199,8 +243,8 @@ export const tags: Record<string, Schema> = {
   },
 };
 
-export function markdocConfig(s: Show): Config {
-  return { tags, variables: { show: s } };
+export function markdocConfig(s: Show, o: Occasion = {}): Config {
+  return { tags, variables: { show: s, occasion: o } };
 }
 
 export { Markdoc };

@@ -6,11 +6,16 @@
   "scripts": {
     "build": "bun src/build.ts",
     "build:all": "bun src/build.ts all --lang both && bun src/build.ts all --lang pali && bun src/build.ts all --lang english",
+    "release": "bun src/release.ts",
+    "site": "bun src/site.ts",
+    "serve": "bun src/serve.ts",
     "check": "bun src/check.ts",
-    "test": "bun test"
+    "test": "bun test",
+    "test:e2e": "bun test ./e2e --timeout 180000"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "playwright-core": "1.64.0"
   },
   "dependencies": {
     "@markdoc/markdoc": "^0.5.10"

@@ -29,11 +29,11 @@ Chandāharaṇa {% changed %}pavāraṇā{% /changed %}-āharaṇāni pana imiss
 
 Utukkhānaṁ nāma, ettakaṁ atikkantaṁ ettakaṁ avasiṭṭhanti evaṁ utu-ācikkhanaṁ. Utūnīdha pana sāsane hemanta-gimha-vassānānaṁ vasena tīṇi honti.
 
-Ayaṁ vassānotu. Imasmiñ-ca utumhi satta ca uposathā ekā ca pavāraṇā. Iminā pakkhena—
+Ayaṁ vassānotu. Imasmiñ-ca utumhi {% slot name="pavarana-uposathas" %}satta ca uposathā ekā ca pavāraṇā{% /slot %}. Iminā pakkhena—
 
 {% lines indent=true %}
 {% changed %}ekā pavāraṇā sampattā{% /changed %},\
-pañca uposathā atikkantā,\
+{% slot name="pavarana-past" %}pañca uposathā atikkantā{% /slot %},\
 {% var note="p1" %}dve uposathā avasiṭṭhā{% /var %}.
 {% /lines %}
 
@@ -45,7 +45,7 @@ Iti evaṁ sabbehi āyasmantehi utukkhānaṁ {% sic correction="dhāretabbaṁ"
 
 {% passage %}
 {% pali %}
-Bhikkhu-gaṇanā nāma imasmiṁ {% changed %}pavāraṇ'agge pavāraṇatthāya{% /changed %} sannipatitā bhikkhū ettakāti bhikkhūnaṁ gaṇanā. Imasmim-pana {% changed %}pavāraṇ'agge{% /changed %} pañca bhikkhū sannipatitā honti. Iti sabbehi āyasmantehi bhikkhu-gaṇanā'pi dhāretabbā.
+Bhikkhu-gaṇanā nāma imasmiṁ {% changed %}pavāraṇ'agge pavāraṇatthāya{% /changed %} sannipatitā bhikkhū ettakāti bhikkhūnaṁ gaṇanā. Imasmim-pana {% changed %}pavāraṇ'agge{% /changed %} {% slot name="bhikkhus-pavarana" %}pañca{% /slot %} bhikkhū sannipatitā honti. Iti sabbehi āyasmantehi bhikkhu-gaṇanā'pi dhāretabbā.
 {% /pali %}
 {% /passage %}
 
@@ -61,7 +61,7 @@ Evan-taṁ navavidhaṁ pubba-kiccaṁ pariniṭṭhitaṁ hoti.
 
 Niṭṭhite ca pubba-kicce.
 
-Sace so divaso cātuddasī-paṇṇarasī-sāmaggīnamaññataro yathājja {% changed %}pavāraṇā paṇṇarasī [cātuddasī]{% /changed %},
+Sace so divaso cātuddasī-paṇṇarasī-sāmaggīnamaññataro yathājja {% changed %}pavāraṇā {% slot name="day" fifteenth="paṇṇarasī" fourteenth="cātuddasī" harmony="sāmaggī" %}paṇṇarasī [cātuddasī]{% /slot %}{% /changed %},
 
 {% list %}
 1. yāvatikā ca bhikkhū kammappattā {% changed %}saṅgha-pavāraṇārahā, pañca{% /changed %} vā tato vā atirekā pakatattā pārājikaṁ anāpannā saṅghena vā anukkhittā,
@@ -98,10 +98,10 @@ dve uposathā avasiṭṭhā.
 
 {% passage %}
 {% pali %}
-Suṇātu me bhante saṅgho. Ajja pavāraṇā paṇṇarasī [cātuddasī]. Yadi saṅghassa pattakallaṁ, saṅgho te-vācikaṁ pavāreyya.
+Suṇātu me bhante saṅgho. Ajja pavāraṇā {% slot name="day" fifteenth="paṇṇarasī" fourteenth="cātuddasī" harmony="sāmaggī" %}paṇṇarasī [cātuddasī]{% /slot %}. Yadi saṅghassa pattakallaṁ, saṅgho {% slot name="statements" three="te-vācikaṁ" two="dve-vācikaṁ" one="eka-vācikaṁ" %}te-vācikaṁ{% /slot %} pavāreyya.
 {% /pali %}
 {% english %}
-"Venerable sirs, may the Community listen to me. Today is the Invitation day on the fifteenth [fourteenth]. If the Community is ready, the Community should invite with three statements."
+"Venerable sirs, may the Community listen to me. Today is the Invitation day on the {% slot name="day" fifteenth="fifteenth" fourteenth="fourteenth" %}fifteenth [fourteenth]{% /slot %}. If the Community is ready, the Community should invite {% slot name="statements" three="with three statements" %}with three statements{% /slot %}."
 {% /english %}
 {% /passage %}
 
@@ -148,10 +148,10 @@ Tatiyam-pi bhante saṅghaṁ pavāremi. Diṭṭhena vā sutena vā parisaṅk�
 
 {% passage %}
 {% pali %}
-Suṇantu me āyasmanto. Ajja pavāraṇā paṇṇarasī [cātuddasī]. Yad'āyasmantānaṁ pattakallaṁ, mayaṁ aññam-aññaṁ pavāreyyāma.
+Suṇantu me āyasmanto. Ajja pavāraṇā {% slot name="day" fifteenth="paṇṇarasī" fourteenth="cātuddasī" harmony="sāmaggī" %}paṇṇarasī [cātuddasī]{% /slot %}. Yad'āyasmantānaṁ pattakallaṁ, mayaṁ aññam-aññaṁ pavāreyyāma.
 {% /pali %}
 {% english %}
-This means: "Listen to me, sirs. Today is the Invitation day on the fifteenth [fourteenth]. If you are ready, we should invite one another."
+This means: "Listen to me, sirs. Today is the Invitation day on the {% slot name="day" fifteenth="fifteenth" fourteenth="fourteenth" %}fifteenth [fourteenth]{% /slot %}. If you are ready, we should invite one another."
 {% /english %}
 {% /passage %}
 

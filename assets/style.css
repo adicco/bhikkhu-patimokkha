@@ -3,7 +3,25 @@
   --muted: #6b645a;
   --accent: #8a3b12;
   --paper: #fdfbf7;
+  --english: #3a352f;
+  --rule: #e4ddd0;
   --measure: 36rem;
+  color-scheme: light;
+}
+/* Dark: follows the system unless the reader has chosen (html[data-theme], set by the toggle). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8e2d8; --muted: #a39a8c; --accent: #e39a62; --paper: #191714; --english: #c9c1b4; --rule: #36312b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #e8e2d8; --muted: #a39a8c; --accent: #e39a62; --paper: #191714; --english: #c9c1b4; --rule: #36312b;
+  color-scheme: dark;
+}
+@media print {
+  :root, :root[data-theme] { --ink: #000; --muted: #555; --accent: #000; --paper: #fff; --english: #333; --rule: #ccc; color-scheme: light; }
+  nav.toggles { display: none; }
 }
 html { background: var(--paper); color: var(--ink); }
 body {
@@ -18,16 +36,16 @@ body.both { max-width: 72rem; }
 h1, h2, h3 { font-weight: normal; text-align: center; letter-spacing: 0.08em; }
 h2 { font-variant: small-caps; font-size: 1.35rem; margin-top: 3rem; }
 h3 { font-style: italic; letter-spacing: 0; font-size: 1.2rem; }
-h2 .english, h3 .english { display: block; font-size: 0.8em; color: var(--muted); }
+h1 .english, h2 .english, h3 .english { display: block; font-size: 0.8em; color: var(--muted); }
 .title { text-align: center; margin: 3rem 0; }
 .title h1 { font-size: 2.2rem; }
 .subtitle { letter-spacing: 0.3em; }
 
 .passage { margin: 1rem 0; }
-.both .passage:has(> .pali):has(> .english) {
+.both .passage:has(> .pali):has(> .english), .both .passage > .row {
   display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;
 }
-.both .english { color: #3a352f; }
+.both .english { color: var(--english); }
 .pali p, .english p, .instruction p { margin: 0 0 0.6rem; text-indent: 1.5em; }
 .lines p, .stanza p, .numbered p, .align-center p, .note p, li p { text-indent: 0; }
 .align-center { text-align: center; }
@@ -43,7 +61,12 @@ h2 .english, h3 .english { display: block; font-size: 0.8em; color: var(--muted)
 .response .pali::after, .rubric .pali::after { content: " )"; }
 .response .english::before, .rubric .english::before { content: "( "; }
 .response .english::after, .rubric .english::after { content: " )"; }
-.both .response .english, .both .rubric .english, .both .vagga .english { margin-left: 2rem; color: var(--muted); }
+.both .response .english, .both .rubric .english, .both .vagga .english { color: var(--muted); }
+/* Bilingual headings and short notes: each language centred over its own column, like the passages. */
+.both :is(.heading, p.response, p.rubric, p.vagga):has(> .pali):has(> .english) {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: baseline; text-align: center;
+}
+body.hide-pali :is(.heading, p.response, p.rubric, p.vagga), body.hide-english :is(.heading, p.response, p.rubric, p.vagga) { display: block !important; }
 span.rubric { margin: 0; }
 .call { font-style: italic; }
 .lead::before { content: "["; } .lead::after { content: "]"; }
@@ -53,7 +76,7 @@ span.rubric { margin: 0; }
 .sic { text-decoration: underline dotted var(--accent); }
 .instruction { font-style: italic; color: var(--muted); }
 .instruction strong { font-style: normal; color: var(--ink); }
-.passage[data-speaker]::before { content: attr(data-speaker) ":"; display: block; font-style: italic; color: var(--muted); }
+.passage[data-speaker]::before { content: attr(data-speaker) ":"; display: block; font-style: italic; color: var(--muted); grid-column: 1 / -1; }
 .note { margin: 1rem 0; }
 .note::before { content: attr(data-label) "."; font-weight: bold; margin-right: 0.4em; float: left; }
 .season-table ul, .numbers ul { list-style: none; padding-left: 1.5em; }
@@ -67,9 +90,14 @@ section.continue { break-before: auto; }
 
 nav.toggles {
   position: sticky; top: 0; z-index: 2; background: var(--paper);
-  display: flex; gap: 0.5rem; justify-content: center; padding: 0.5rem; border-bottom: 1px solid #e4ddd0;
+  display: flex; gap: 0.5rem; justify-content: center; padding: 0.5rem; border-bottom: 1px solid var(--rule);
   font-size: 0.9rem;
 }
 nav.toggles label { cursor: pointer; user-select: none; }
+nav.toggles button { font: inherit; color: var(--muted); background: none; border: 1px solid var(--rule); border-radius: 3px; padding: 0 0.5rem; margin-left: 1rem; cursor: pointer; }
+nav.toggles button:hover { color: var(--ink); }
 body.hide-pali .pali, body.hide-english .english, body.hide-english .instruction { display: none; }
-body.hide-pali .passage, body.hide-english .passage { display: block !important; }
+body.hide-pali .passage, body.hide-english .passage, body.hide-pali .row, body.hide-english .row { display: block !important; }
+
+/* Custom builds: English the book gives no translation for keeps its printed reading (see src/occasion.ts). */
+.slot.unglossed { text-decoration: underline dotted #6b645a; text-underline-offset: 0.2em; }

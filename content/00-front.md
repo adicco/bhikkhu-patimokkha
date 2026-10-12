@@ -6,9 +6,7 @@ slug: front
 {% title pali="Bhikkhu Pāṭimokkha" english="Pāli – English" /%}
 
 {% colophon %}
-The printing of this book has been sponsored by Palelai Buddhist Temple, Singapore.
-
-Printed in Singapore.
+From Ṭhānissaro Bhikkhu's 2008 edition of the *Bhikkhu Pāṭimokkha* (Pāli – English), originally printed by Palelai Buddhist Temple, Singapore.
 {% /colophon %}
 
 {% heading english="Foreword" /%}

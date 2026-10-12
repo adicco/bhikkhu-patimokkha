@@ -11,10 +11,10 @@ slug: group-uposatha
 
 {% passage %}
 {% pali %}
-Suṇantu me bhante [āvuso] āyasmantā, ajj'uposatho paṇṇaraso [cātuddaso]. Yad'āyasmantānaṁ pattakallaṁ, mayaṁ aññam-aññaṁ pārisuddhi-uposathaṁ kareyyāma.
+Suṇantu me {% slot name="address" bhante="bhante" avuso="āvuso" %}bhante [āvuso]{% /slot %} āyasmantā, ajj'uposatho {% slot name="day" fifteenth="paṇṇaraso" fourteenth="cātuddaso" %}paṇṇaraso [cātuddaso]{% /slot %}. Yad'āyasmantānaṁ pattakallaṁ, mayaṁ aññam-aññaṁ pārisuddhi-uposathaṁ kareyyāma.
 {% /pali %}
 {% english %}
-This means: "May the venerable ones listen to me, sirs [friends]. Today is the uposatha of the fifteenth [fourteenth]. If the venerable ones are ready, we should perform our uposatha of mutual purity."
+This means: "May the venerable ones listen to me, {% slot name="address" bhante="sirs" avuso="friends" %}sirs [friends]{% /slot %}. Today is the uposatha of the {% slot name="day" fifteenth="fifteenth" fourteenth="fourteenth" %}fifteenth [fourteenth]{% /slot %}. If the venerable ones are ready, we should perform our uposatha of mutual purity."
 {% /english %}
 {% /passage %}
 

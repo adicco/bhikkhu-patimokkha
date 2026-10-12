@@ -68,6 +68,32 @@ Two printing slips that don't affect pronunciation were silently normalised:
 anumānetabbo / anumānetabbā, paññapanañ-ca, pattakallattaṁ, paṭikkarissāmi,
 saṅgha-pavāraṇārahā, veṭṭhita-sīsassa, plus the `sic` readings muḷho'si and Uppannunānaṁ.
 
+## Readings for a particular occasion
+
+Custom builds (`--season`, `--bhikkhus` …, see the main README) substitute readings marked with
+`{% slot %}`. Wrapping text in slots changed no printed text: with no occasion set, the Markdown
+and LaTeX outputs are byte-identical to the earlier ones, and the HTML differs only by the slot
+spans. The Pāli substitutes are taken verbatim from the notes (test/occasion.test.ts checks every
+one against the notes chapter and the Pavāraṇā chapter). Note 4's *sattā* is substituted with
+its `{% sic %}`, so it prints as the book has it unless `--corrections` is given.
+
+English: the book glosses only some of these readings. Where a note gives a gloss, it is used;
+otherwise the English is left as printed (and the HTML marks it `unglossed`). Choices made in
+fitting the glosses into the sentence, all in `src/occasion.ts`:
+
+- Note 1 (night): the gloss "Of the first four…" is set as **"The first four"**, replacing
+  "With regard to the first four of these, there is no lamp-duty … The remaining three", so that
+  the sentence reads "The first four have been done by bhikkhus who know…".
+- Note 3 (season): "summer" and "rainy season" come from the passage's own list ("winter,
+  summer, and the rainy season"), not from the note's wording ("hot season").
+- Note 4: the glosses are fitted after "in this season" as "there are seven uposathas and one
+  pavāraṇā" and "there are, because of the additional month, ten [nine] uposathas (and one
+  pavāraṇā)", lower-cased as in the notes.
+- Note 6: the English count is the note's numeral ("12 bhikkhus"); four stays "four".
+- Address: "Venerable sirs [friends]" becomes "Friends" when the senior bhikkhu gives the motion.
+- Not glossed, so left as printed: note 5's counts ("seven Uposathas remain"), the Pavāraṇā's
+  "with three statements", and "fifteenth [fourteenth]" on a harmony Pavāraṇā.
+
 ## Not covered as thoroughly
 
 - The English of book pp. 164–188 (after-Pāṭimokkha translations, group uposatha and

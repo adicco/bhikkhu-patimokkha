@@ -3,6 +3,7 @@ import { join } from "node:path";
 import Markdoc, { Tag, type RenderableTreeNode } from "@markdoc/markdoc";
 import { markdocConfig } from "./schema";
 import type { Show } from "./options";
+import type { Occasion } from "./occasion";
 
 export const CONTENT_DIR = join(import.meta.dir, "..", "content");
 
@@ -49,6 +50,8 @@ export function smartQuotes(s: string, prev = " "): string {
   return out;
 }
 
+const BLOCKS = new Set(["p", "li", "div", "section", "header", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th"]);
+
 function typography(node: RenderableTreeNode, state = { prev: " " }): RenderableTreeNode {
   if (typeof node === "string") {
     const out = smartQuotes(node, state.prev);
@@ -57,6 +60,8 @@ function typography(node: RenderableTreeNode, state = { prev: " " }): Renderable
   }
   if (Array.isArray(node)) return node.map((n) => typography(n, state)) as any;
   if (Tag.isTag(node)) {
+    // A quote at the start of a block opens, whatever ended the block before it.
+    if (BLOCKS.has(node.name)) state.prev = " ";
     node.children = node.children.map((c) => typography(c, state));
     for (const k of ["title"]) if (typeof node.attributes[k] === "string") node.attributes[k] = smartQuotes(node.attributes[k]);
   }
@@ -68,10 +73,15 @@ export interface Rendered {
   tree: Tag;
 }
 
-export function render(chapters: Chapter[], show: Show): Rendered[] {
-  const config = markdocConfig(show);
+/**
+ * `occasion` fills in the readings that change from one uposatha to the next; `only` keeps just
+ * the chapters with these slugs (in book order).
+ */
+export function render(chapters: Chapter[], show: Show, occasion: Occasion = {}, only?: string[]): Rendered[] {
+  const config = markdocConfig(show, occasion);
   return chapters
     .filter((c) => show.notes || c.kind !== "notes")
+    .filter((c) => !only || only.includes(c.slug))
     .map((chapter) => {
       const tree = typography(Markdoc.transform(chapter.ast, config)) as Tag;
       return { chapter, tree };

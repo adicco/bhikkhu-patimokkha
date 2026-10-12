@@ -49,10 +49,10 @@ instructing the bhikkhunīs.
 
 {% passage %}
 {% pali %}
-Tattha purimesu catūsu kiccesu padīpa-kiccaṁ idāni suriy'ālokassa atthitāya n'atthi. {% var note="1" %}Aparāni tīṇi{% /var %} bhikkhūnaṁ vattaṁ jānantehi {% var note="2" %}bhikkhūhi{% /var %} katāni pariniṭṭhitāni honti.
+{% slot name="time" %}Tattha purimesu catūsu kiccesu padīpa-kiccaṁ idāni suriy'ālokassa atthitāya n'atthi. {% var note="1" %}Aparāni tīṇi{% /var %}{% /slot %} bhikkhūnaṁ vattaṁ jānantehi {% slot name="helpers" %}{% var note="2" %}bhikkhūhi{% /var %}{% /slot %} katāni pariniṭṭhitāni honti.
 {% /pali %}
 {% english %}
-With regard to the first four of these, there is no lamp-duty because of the current presence of sunlight. The remaining three have been done by bhikkhus who know the bhikkhus' duties. These are therefore completed.
+{% slot name="time" %}With regard to the first four of these, there is no lamp-duty because of the current presence of sunlight. The remaining three{% /slot %} have been done by {% slot name="helpers" %}bhikkhus{% /slot %} who know the bhikkhus' duties. These are therefore completed.
 {% /english %}
 {% /passage %}
 
@@ -78,21 +78,21 @@ In this Teaching there are three seasons: winter, summer, and the rainy season.
 
 {% passage %}
 {% pali %}
-Ayaṁ {% var note="3" %}hemantotu{% /var %}. Asmiñ-ca utumhi {% var note="4" %}aṭṭha uposathā{% /var %}. Iminā pakkhena:
+Ayaṁ {% slot name="season" %}{% var note="3" %}hemantotu{% /var %}{% /slot %}. Asmiñ-ca utumhi {% slot name="uposathas" %}{% var note="4" %}aṭṭha uposathā{% /var %}{% /slot %}. Iminā pakkhena:
 
 {% lines indent=true %}
 eko uposatho sampatto,\
-{% var note="5" %}satta uposathā avasiṭṭhā{% /var %}.
+{% slot name="remaining" %}{% var note="5" %}satta uposathā avasiṭṭhā{% /var %}{% /slot %}.
 {% /lines %}
 
 Iti evaṁ sabbehi āyasmantehi utukkhānaṁ dhāretabbaṁ.
 {% /pali %}
 {% english %}
-This is the {% var %}winter{% /var %}, and in this season there are {% var %}eight{% /var %} Uposathas. With this fortnight:
+This is the {% slot name="season" %}{% var %}winter{% /var %}{% /slot %}, and in this season {% slot name="uposathas" %}there are {% var %}eight{% /var %} Uposathas{% /slot %}. With this fortnight:
 
 {% lines indent=true %}
 one Uposatha has arrived;\
-{% var %}seven{% /var %} Uposathas remain.
+{% slot name="remaining" %}{% var %}seven{% /var %} Uposathas remain{% /slot %}.
 {% /lines %}
 
 That's how the venerable ones should all remember the season-telling.
@@ -103,10 +103,10 @@ That's how the venerable ones should all remember the season-telling.
 
 {% passage %}
 {% pali %}
-Bhikkhu-gaṇanā nāma imasmiṁ uposath'agge uposathatthāya sannipatitā bhikkhū ettakāti bhikkhūnaṁ gaṇanā. Imasmim-pana uposath'agge {% var note="6" %}cattāro{% /var %} bhikkhū sannipatitā honti. Iti sabbehi āyasmantehi bhikkhu-gaṇanā-pi dhāretabbā.
+Bhikkhu-gaṇanā nāma imasmiṁ uposath'agge uposathatthāya sannipatitā bhikkhū ettakāti bhikkhūnaṁ gaṇanā. Imasmim-pana uposath'agge {% slot name="bhikkhus" %}{% var note="6" %}cattāro{% /var %}{% /slot %} bhikkhū sannipatitā honti. Iti sabbehi āyasmantehi bhikkhu-gaṇanā-pi dhāretabbā.
 {% /pali %}
 {% english %}
-Bhikkhu-counting means counting the number of bhikkhus, (saying,) "This number of bhikkhus has gathered in this Uposatha hall for the purpose of the Uposatha." And in this Uposatha hall {% var %}four{% /var %} bhikkhus have gathered.
+Bhikkhu-counting means counting the number of bhikkhus, (saying,) "This number of bhikkhus has gathered in this Uposatha hall for the purpose of the Uposatha." And in this Uposatha hall {% slot name="bhikkhus" %}{% var %}four{% /var %}{% /slot %} bhikkhus have gathered.
 
 That's how the venerable ones should all remember the bhikkhu-counting.
 {% /english %}
@@ -136,7 +136,7 @@ Thus the ninefold preliminary duty has been completed by the doing of what there
 
 {% passage %}
 {% pali %}
-Niṭṭhite ca pubba-kicce, sace so divaso cātuddasī-paṇṇarasī-sāmaggīnamaññataro yathājja uposatho paṇṇaraso [cātuddaso],
+Niṭṭhite ca pubba-kicce, sace so divaso cātuddasī-paṇṇarasī-sāmaggīnamaññataro yathājja uposatho {% slot name="day" fifteenth="paṇṇaraso" fourteenth="cātuddaso" %}paṇṇaraso [cātuddaso]{% /slot %},
 
 {% list %}
 1. yāvatikā ca bhikkhū kammappattā saṅgh'uposathārahā, cattāro vā tato vā atirekā pakatattā pārājikaṁ anāpannā saṅghena vā anukkhittā,
@@ -150,7 +150,7 @@ Evan-taṁ uposatha-kammaṁ imehi catūhi lakkhaṇehi saṅgahitaṁ pattakall
 Uposatha-kammassa pattakallattaṁ viditvā idāni kariyamāno uposatho saṅghena anumānetabbo.
 {% /pali %}
 {% english %}
-When the preliminary duty has been completed, if the day is either the fourteenth, the fifteenth, or the harmony day—as today is the fifteenth [fourteenth]—then:
+When the preliminary duty has been completed, if the day is either the fourteenth, the fifteenth, or the harmony day—as today is the {% slot name="day" fifteenth="fifteenth" fourteenth="fourteenth" %}fifteenth [fourteenth]{% /slot %}—then:
 
 {% list %}
 1. if the bhikkhus coming to the transaction and appropriate for the Saṅgha-uposatha number four or more, being regular bhikkhus who have neither committed a pārājika offense nor been suspended by the Saṅgha;
