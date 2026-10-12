@@ -325,13 +325,16 @@ describe("the preview", () => {
     const ink = "rgb(31, 38, 29)";
     const stylus = "rgb(85, 96, 82)";
     const base = await look();
-    expect(base).toMatchObject({ layout: "stacked", english: 0.8, color: stylus, beside: false });
+    expect(base).toMatchObject({ layout: "stacked", color: stylus, beside: false });
+    expect(base.english).toBeCloseTo(12 / 13, 2);
 
     await change(page, () => page.selectOption('select[name="size"]', "14"));
-    expect((await look()).size / base.size).toBeCloseTo(14 / 11, 2);
+    expect((await look()).size / base.size).toBeCloseTo(14 / 13, 2);
 
     await change(page, () => page.check(radio("columns", "1")));
-    expect(await look()).toMatchObject({ layout: "columns", english: 0.8, color: ink, beside: true });
+    const columns = await look();
+    expect(columns).toMatchObject({ layout: "columns", color: ink, beside: true });
+    expect(columns.english).toBeCloseTo(12 / 13, 2);
 
     await change(page, () => page.check(radio("paper", "booklet")));
     expect(await look()).toMatchObject({ layout: "facing", english: 1, color: ink, beside: true });
@@ -433,7 +436,7 @@ describe("file options", () => {
     expect(await visible()).toEqual({ paper: true, columns: false, size: true, signature: false, instructions: false, button: "Build A4 PDF" });
     expect((await formState(page)).size).toBe("13");
     await change(page, () => page.check(radio("lang", "english")));
-    expect((await formState(page)).size).toBe("11");
+    expect((await formState(page)).size).toBe("13");
     for (const [target, label] of [["epub", "EPUB"], ["html", "HTML"], ["md", "Markdown"]]) {
       await change(page, () => page.check(radio("target", target!)));
       expect(await visible()).toEqual({ paper: false, columns: false, size: false, signature: false, instructions: true, button: `Build ${label}` });
@@ -457,7 +460,7 @@ describe("file options", () => {
     await change(page, () => page.check(radio("lang", "both")));
     await change(page, () => page.check(radio("paper", "a4")));
     await change(page, () => page.check(radio("columns", "1")));
-    expect(await page.textContent("#cli")).toMatch(/^bun run build -- pdf --lang both --paper a4 --size 11 --columns --chapters pubba-kicca --no-notes --instructions /);
+    expect(await page.textContent("#cli")).toMatch(/^bun run build -- pdf --lang both --paper a4 --size 13 --columns --chapters pubba-kicca --no-notes --instructions /);
   }));
 });
 

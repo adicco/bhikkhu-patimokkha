@@ -159,6 +159,9 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
   // article itself only knows 10, 11 and 12pt and silently falls back to 10pt for anything else;
   // other sizes go through the fontsize package, which scales \small, \large etc. to match.
   const classSize = [10, 11, 12].includes(opts.fontSize);
+  // English beside or under the Pāli is set at 12/13 of the base (12pt at the default 13pt); on
+  // the booklet's facing page it is the main text, at full size.
+  const englishSize = +(opts.fontSize * 12 / 13).toFixed(2);
   return String.raw`\documentclass[${classSize ? `${opts.fontSize}pt,` : ""}twoside]{article}
 ${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usepackage[${geometry}]{geometry}
 \usepackage{fontspec}
@@ -179,7 +182,7 @@ ${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usep
 \sloppy\emergencystretch=3em
 \setlist{nosep,leftmargin=2.2em}
 \newcommand{\englishcolor}{${layout === "stacked" ? "\\color{black!60}" : ""}}
-\newcommand{\englishfont}{${layout === "facing" ? "" : "\\small"}\englishcolor}
+\newcommand{\englishfont}{${layout === "facing" ? "" : `\\fontsize{${englishSize}pt}{${+(englishSize * 1.2).toFixed(2)}pt}\\selectfont`}\englishcolor}
 \newcommand{\heading}[1]{\par\bigskip{\centering\large\scshape #1\par}\nopagebreak\medskip}
 \newcommand{\subheading}[1]{\par\medskip{\centering\itshape #1\par}\nopagebreak\smallskip}
 \newenvironment{lines}[1][1.5em]{\par\begingroup\setlength{\parindent}{0pt}\setlength{\leftskip}{#1}\raggedright}{\par\endgroup}

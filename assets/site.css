@@ -166,7 +166,7 @@ button:disabled { background: var(--stylus); cursor: progress; }
 #preview .lines p { margin-left: 1.5em; }
 /* English as each PDF layout sets it (src/writers/latex.ts): stacked is small and grey,
    columns small, the booklet's facing page and an English-only build full size. */
-#preview .english { font-size: 0.8em; line-height: 1.5; color: var(--stylus); margin: 0.2rem 0 0; }
+#preview .english { font-size: calc(12em / 13); line-height: 1.5; color: var(--stylus); margin: 0.2rem 0 0; }
 #preview[data-layout="columns"] .english { color: var(--ink); }
 #preview[data-layout="facing"] .english,
 #preview[data-layout="single"] .english { font-size: 1em; line-height: 1.55; color: var(--ink); margin: 0; }

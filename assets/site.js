@@ -171,7 +171,7 @@
       : value("paper") === "booklet" ? "facing" : value("columns") ? "columns" : "stacked";
     const p = $("#preview");
     p.dataset.layout = layout;
-    p.style.setProperty("--scale", pdf ? String(Number(value("size")) / 11) : "1");
+    p.style.setProperty("--scale", pdf ? String(Number(value("size")) / 13) : "1");
   }
 
   // ---- The request: the same shape for the preview and the build.
@@ -292,7 +292,6 @@
     // customised (Pāli only drops the notes). A chapter chosen by hand is kept otherwise.
     if (value("ceremony") !== lastCeremony || (name === "lang" && !customised)) presetChapters();
     lastCeremony = value("ceremony");
-    if (name === "lang") set("size", value("lang") === "pali" ? 13 : 11);
     sync();
     later();
   });
@@ -331,7 +330,7 @@
 
   // ---- Start.
   dateSelect.value = upcoming[0]?.date ?? "";
-  set("size", 11);
+  set("size", 13);
   applyDate();
   fillFortnights();
   if (upcoming[0] && !upcoming[0].pavarana) set("fortnight", upcoming[0].fortnight);

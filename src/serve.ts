@@ -110,7 +110,7 @@ function parse(body: any): { req?: BuildRequest; args: string[]; errors: string[
     lang: oneOf(body.lang, ["both", "pali", "english"] as const, "lang", errors) ?? "both",
     target: oneOf(body.target, ["pdf", "epub", "html", "md"] as const, "target", errors) ?? "pdf",
     paper: oneOf(body.paper, ["a4", "a5", "booklet"] as const, "paper", errors) ?? "a5",
-    size: int(body.size, 8, 28, "size", errors) ?? 11,
+    size: int(body.size, 8, 28, "size", errors) ?? 13,
     columns: body.columns === true,
     signature: int(body.signature, 4, 64, "signature", errors),
     chapters: SLUGS.filter((s) => chapters.includes(s)),
