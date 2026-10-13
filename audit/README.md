@@ -1,7 +1,7 @@
 # Transcription audit
 
 Source: `BhikkhuPaṭimokkha.Pāli-English.Ṭhānissaro.pdf` (192 pp., Adobe ClearScan of the
-2008 Metta Forest Monastery printing). PDF page = book page + 4.
+2008 printing, sponsored by Palelai Buddhist Temple, Singapore). PDF page = book page + 4.
 
 The PDF's text layer is OCR and unusable for Pāli: ṁ comes out as `rh`/`ril`/`riz`, ñ as `ft`/`fi`,
 and dots below are dropped. So the Pāli was **typed from the page images**, not copied from

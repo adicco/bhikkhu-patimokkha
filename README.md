@@ -1,7 +1,7 @@
 # Bhikkhu Pāṭimokkha — Pāli / English in Markdoc
 
-The *Bhikkhu Pāṭimokkha* (Pāli–English edition, tr. Ṭhānissaro Bhikkhu, Metta Forest
-Monastery 2008), transcribed into [Markdoc](https://markdoc.dev) so that the Pāli and the
+The *Bhikkhu Pāṭimokkha* (Pāli–English edition, tr. Ṭhānissaro Bhikkhu, 2008;
+printed by Palelai Buddhist Temple, Singapore), transcribed into [Markdoc](https://markdoc.dev) so that the Pāli and the
 English live in separate components and can be shown, hidden or built separately.
 
 ## Build
