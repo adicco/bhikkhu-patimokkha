@@ -95,3 +95,23 @@ export function validate(chapters: Chapter[]) {
     Markdoc.validate(c.ast, config).map((e) => ({ file: c.file, line: e.lines?.[0], ...e.error })),
   );
 }
+
+/**
+ * Every distinct Pāli word in the book (lowercase, split at hyphens and apostrophes), so that
+ * writers can keep the English rules for breaking words off the Pāli quoted in English text.
+ */
+export function paliWords(chapters: Chapter[]): Set<string> {
+  const words = new Set<string>();
+  // Only text marked as Pāli: the notes chapter mixes English prose with Pāli readings.
+  const visit = (n: RenderableTreeNode, pali: boolean) => {
+    if (typeof n === "string") {
+      if (pali) for (const w of n.toLowerCase().split(/[^\p{L}]+/u)) if (w) words.add(w);
+    } else if (Tag.isTag(n) && n.attributes.lang !== "en") {
+      const inner = pali || n.attributes.lang === "pi" || /\bnumbers\b/.test(n.attributes.class ?? "");
+      n.children.forEach((c) => visit(c, inner));
+    }
+  };
+  const show = { pali: true, english: false, instructions: false, notes: true, corrections: true };
+  for (const { tree } of render(chapters, show)) visit(tree, false);
+  return words;
+}

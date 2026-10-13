@@ -9,7 +9,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { baseName } from "./artifacts";
 import { orList, parseCli, suggest, usageError } from "./cli";
-import { loadChapters, render, validate } from "./load";
+import { loadChapters, paliWords, render, validate } from "./load";
 import { showFor, type Lang } from "./options";
 import { occasionErrors, OCCASION_CHOICES, type Occasion } from "./occasion";
 import { toMarkdown } from "./writers/markdown";
@@ -242,8 +242,9 @@ if (targets.has("pdf")) {
   // follows the printed book: Pāli on the left page, English on the facing right page.
 
   const layout = values.columns ? "columns" : "stacked";
+  const pali = paliWords(chapters);
   async function typeset(paper: "a4" | "a5", layout: "stacked" | "columns" | "facing", name = `${base}.${paper}`) {
-    writeFileSync(join(outDir, `${name}.tex`), toLatex(rendered, show, { title, paper, fontSize, layout }));
+    writeFileSync(join(outDir, `${name}.tex`), toLatex(rendered, show, { title, paper, fontSize, layout, paliWords: pali }));
     for (let i = 0; i < 2; i++) await run(lualatex(name));
     for (const ext of ["aux", "log", "out", "toc"]) rmSync(join(outDir, `${name}.${ext}`), { force: true });
     return `${name}.pdf`;

@@ -6,6 +6,8 @@ tag. Left empty, the notes list the commit messages since the last release.
 
 ## Unreleased
 
+**PDF line breaks**: Pāli words are no longer broken by the English hyphenation rules (_man-asikaroma_, _up-osatha_). Pāli now breaks only at the hyphens the book prints between the parts of a compound (_uposatha-kammaṁ_), including Pāli words quoted in the English (_Uposatha hall_).
+
 ## v2026.10.12.2 (12 October 2026)
 
 **EPUB fixes**: The title and author no longer turn into "P�����imokkha" in builds from the website. Table-of-contents links now open the right chapter in readers such as Lithium, which showed "Content missing" because chapter anchors contained diacritics (`#pārājika`). All three EPUBs now pass epubcheck (a duplicate `nidana` id is gone).

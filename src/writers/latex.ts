@@ -23,6 +23,8 @@ export interface LatexOptions {
    * - facing:  Pāli on the left page, English on the facing right page, as in the printed book
    */
   layout?: "stacked" | "columns" | "facing";
+  /** Pāli words (lowercase) never to be broken by the English patterns when quoted in English. */
+  paliWords?: Iterable<string>;
 }
 
 export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): string {
@@ -31,6 +33,8 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
   /** True while typesetting the facing-pages (paracol) part of the book. */
   let open = false;
   const english = (s: string) => `{\\englishcolor ${s}}`;
+  /** Pāli breaks only at the hyphens the book prints (compounds), never by the English patterns. */
+  const paliBlock = (s: string) => `{\\pali\n${s}\\par}`;
 
   function inline(n: RenderableTreeNode): string {
     if (typeof n === "string") return esc(n);
@@ -42,6 +46,7 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
       case "br": return "\\\\\n";
       case "sup": return `\\textsuperscript{${inner()}}`;
     }
+    if (n.attributes.lang === "pi") return `{\\pali ${inner()}}`;
     if (cls(n, "num")) return `\\textbf{${inner()}}`;
     if (cls(n, "call")) return `\\textit{${inner()}}`;
     if (cls(n, "lead")) return `[${inner()}]`;
@@ -100,7 +105,7 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
     if (cls(n, "note")) {
       return `\\begin{notepara}{${n.attributes["data-label"]}}\n${blocks(kids)}\n\\end{notepara}`;
     }
-    if (cls(n, "numbers")) return `\\begin{multicols}{2}\\small\n${blocks(kids)}\n\\end{multicols}`;
+    if (cls(n, "numbers")) return `\\begin{multicols}{2}\\small\\pali\n${blocks(kids)}\n\\end{multicols}`;
     if (cls(n, "epigraph")) return `\\vfill\\begin{center}\\itshape\n${blocks(kids)}\n\\end{center}\\vfill\\clearpage`;
     if (cls(n, "source")) return `\\hfill\\upshape ${kids.map(inline).join("")}`;
     if (cls(n, "passage")) {
@@ -110,16 +115,17 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
       const wrap = (s: string) => (center ? centered(s) : s);
       if (open && pali && english) {
         // Left and right pages stay in step at every passage (paracol's synchronised switch).
-        return `\\switchcolumn[0]*\n${speaker}${wrap(blocks(pali.children))}\n\\switchcolumn[1]\n${speaker}${wrap(blocks(english.children))}`;
+        return `\\switchcolumn[0]*\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn[1]\n${speaker}${wrap(blocks(english.children))}`;
       }
       if (layout === "columns" && pali && english) {
         // Columns stay in step at every passage (paracol's synchronised switch).
-        return `\\begin{paracol}{2}\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker}${wrap(blocks(pali.children))}\n\\switchcolumn\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker ? "\\mbox{}\\par\n" : ""}{\\englishfont\n${wrap(blocks(english.children))}\\par}\n\\end{paracol}`;
+        return `\\begin{paracol}{2}\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker ? "\\mbox{}\\par\n" : ""}{\\englishfont\n${wrap(blocks(english.children))}\\par}\n\\end{paracol}`;
       }
       const body = speaker + blocks(kids);
       if (open) return `\\switchcolumn[${english ? 1 : 0}]*\n${wrap(body)}`;
       return wrap(body);
     }
+    if (n.attributes.lang === "pi") return paliBlock(blocks(kids));
     if (cls(n, "english") && both) {
       // Stacked: the English follows its Pāli, set off by a little space.
       const gap = layout === "stacked" ? "\\par\\vspace{0.15em}" : "";
@@ -162,12 +168,19 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
   // English beside or under the Pāli is set at 12/13 of the base (12pt at the default 13pt); on
   // the booklet's facing page it is the main text, at full size.
   const englishSize = +(opts.fontSize * 12 / 13).toFixed(2);
+  // An exception with no break points: the English patterns leave the word whole (and its plural,
+  // as in "Uposathas"). Breaks at printed hyphens are unaffected.
+  const words = [...new Set([...opts.paliWords ?? []].flatMap((w) => [w, `${w}s`]))].sort();
+  const hyphenation = words.length ? `\\hyphenation{${words.join(" ")}}\n` : "";
   return String.raw`\documentclass[${classSize ? `${opts.fontSize}pt,` : ""}twoside]{article}
 ${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usepackage[${geometry}]{geometry}
 \usepackage{fontspec}
 \usepackage{xcolor}
 \setmainfont{Gentium Plus}
-\usepackage{microtype}
+% Pāli: a language with no hyphenation patterns, so lines break only at printed hyphens.
+\newlanguage\palilanguage
+\newcommand{\pali}{\language=\palilanguage\relax}
+${hyphenation}\usepackage{microtype}
 \usepackage{paracol}
 \usepackage{ragged2e}
 \usepackage{multicol}
