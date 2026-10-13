@@ -11,15 +11,24 @@
 ARG BUN_VERSION=1.4.2
 FROM oven/bun:${BUN_VERSION}-debian AS bun
 
-# Debian 13: pandoc 3 (for --split-level), LuaLaTeX, Gentium Plus, fonttools for the web font subset.
+# Debian 13: LuaLaTeX, Gentium Plus, fonttools for the web font subset.
 FROM debian:trixie-slim
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       ca-certificates fontconfig fonts-sil-gentiumplus \
       texlive-luatex texlive-latex-recommended texlive-latex-extra \
-      pandoc zip python3-fonttools python3-brotli \
+      zip python3-fonttools python3-brotli \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+
+# Pandoc from upstream, the version the GitHub releases are built with. Debian 13's 3.1.11 doesn't
+# split our <section>-wrapped chapters: the EPUB came out as one file with dead TOC links (text/#…).
+ARG PANDOC_VERSION=3.11
+ARG TARGETARCH
+ADD https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux-${TARGETARCH}.tar.gz /tmp/pandoc.tar.gz
+RUN tar -xzf /tmp/pandoc.tar.gz -C /usr/local --strip-components=1 \
+ && rm /tmp/pandoc.tar.gz \
+ && pandoc --version | head -1
 # The slim image has no locale; without UTF-8, tools decode non-ASCII arguments as garbage.
 ENV LANG=C.UTF-8
 
