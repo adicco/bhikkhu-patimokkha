@@ -6,6 +6,8 @@ tag. Left empty, the notes list the commit messages since the last release.
 
 ## Unreleased
 
+## v2026.10.13.1 (13 October 2026)
+
 **PDF line breaks**: Pāli words are no longer broken by the English hyphenation rules (_man-asikaroma_, _up-osatha_). Pāli now breaks only at the hyphens the book prints between the parts of a compound (_uposatha-kammaṁ_), including Pāli words quoted in the English (_Uposatha hall_). The Pāli is set ragged-right, with even spaces between words, rather than justified; centred lines stay centred and the English stays justified.
 
 ## v2026.10.12.2 (12 October 2026)
