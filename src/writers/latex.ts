@@ -33,8 +33,11 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
   /** True while typesetting the facing-pages (paracol) part of the book. */
   let open = false;
   const english = (s: string) => `{\\englishcolor ${s}}`;
-  /** Pāli breaks only at the hyphens the book prints (compounds), never by the English patterns. */
-  const paliBlock = (s: string) => `{\\pali\n${s}\\par}`;
+  /** True while typesetting a centred passage, whose Pāli must not be set ragged-right. */
+  let centering = false;
+  /** Pāli breaks only at the hyphens the book prints (compounds), never by the English patterns;
+   *  without hyphenation, justified lines open wide gaps, so it is set ragged-right. */
+  const paliBlock = (s: string) => `{\\pali${centering ? "" : "\\paliragged"}\n${s}\\par}`;
 
   function inline(n: RenderableTreeNode): string {
     if (typeof n === "string") return esc(n);
@@ -113,17 +116,21 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
       const center = cls(n, "align-center");
       const { pali, english } = languages(n);
       const wrap = (s: string) => (center ? centered(s) : s);
-      if (open && pali && english) {
-        // Left and right pages stay in step at every passage (paracol's synchronised switch).
-        return `\\switchcolumn[0]*\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn[1]\n${speaker}${wrap(blocks(english.children))}`;
-      }
-      if (layout === "columns" && pali && english) {
-        // Columns stay in step at every passage (paracol's synchronised switch).
-        return `\\begin{paracol}{2}\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker ? "\\mbox{}\\par\n" : ""}{\\englishfont\n${wrap(blocks(english.children))}\\par}\n\\end{paracol}`;
-      }
-      const body = speaker + blocks(kids);
-      if (open) return `\\switchcolumn[${english ? 1 : 0}]*\n${wrap(body)}`;
-      return wrap(body);
+      // Centred Pāli stays centred rather than ragged-right.
+      centering = center;
+      try {
+        if (open && pali && english) {
+          // Left and right pages stay in step at every passage (paracol's synchronised switch).
+          return `\\switchcolumn[0]*\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn[1]\n${speaker}${wrap(blocks(english.children))}`;
+        }
+        if (layout === "columns" && pali && english) {
+          // Columns stay in step at every passage (paracol's synchronised switch).
+          return `\\begin{paracol}{2}\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker}${wrap(paliBlock(blocks(pali.children)))}\n\\switchcolumn\n\\RaggedRight\\setlength{\\parindent}{1.5em}\n${speaker ? "\\mbox{}\\par\n" : ""}{\\englishfont\n${wrap(blocks(english.children))}\\par}\n\\end{paracol}`;
+        }
+        const body = speaker + blocks(kids);
+        if (open) return `\\switchcolumn[${english ? 1 : 0}]*\n${wrap(body)}`;
+        return wrap(body);
+      } finally { centering = false; }
     }
     if (n.attributes.lang === "pi") return paliBlock(blocks(kids));
     if (cls(n, "english") && both) {
@@ -180,6 +187,7 @@ ${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usep
 % Pāli: a language with no hyphenation patterns, so lines break only at printed hyphens.
 \newlanguage\palilanguage
 \newcommand{\pali}{\language=\palilanguage\relax}
+\newcommand{\paliragged}{\RaggedRight\setlength{\parindent}{1.5em}}
 ${hyphenation}\usepackage{microtype}
 \usepackage{paracol}
 \usepackage{ragged2e}
