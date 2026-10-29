@@ -11,6 +11,7 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
+    env_file: [./.env]
     environment:
       BUILD_CONCURRENCY: "1"   # LaTeX is CPU-bound; raise with the VPS's cores
       BUILD_QUEUE: "8"
