@@ -190,6 +190,7 @@ ${classSize ? "" : `\\usepackage[fontsize=${opts.fontSize}pt]{fontsize}\n`}\usep
 \newcommand{\paliragged}{\RaggedRight\setlength{\parindent}{1.5em}}
 ${hyphenation}\usepackage{microtype}
 \usepackage{paracol}
+\usepackage{needspace}
 \usepackage{ragged2e}
 \usepackage{multicol}
 \usepackage[shortlabels]{enumitem}
@@ -201,11 +202,14 @@ ${hyphenation}\usepackage{microtype}
 \setlength{\columnsep}{1.6em}
 \linespread{1.08}
 \sloppy\emergencystretch=3em
+% No lone first or last line of a paragraph at a page break, so a rule of three lines or fewer stays whole.
+\clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000
 \setlist{nosep,leftmargin=2.2em}
 \newcommand{\englishcolor}{${layout === "stacked" ? "\\color{black!60}" : ""}}
 \newcommand{\englishfont}{${layout === "facing" ? "" : `\\fontsize{${englishSize}pt}{${+(englishSize * 1.2).toFixed(2)}pt}\\selectfont`}\englishcolor}
-\newcommand{\heading}[1]{\par\bigskip{\centering\large\scshape #1\par}\nopagebreak\medskip}
-\newcommand{\subheading}[1]{\par\medskip{\centering\itshape #1\par}\nopagebreak\smallskip}
+% A heading needs room for itself and a few lines of what follows, or it moves to the next page.
+\newcommand{\heading}[1]{\par\needspace{8\baselineskip}\bigskip{\centering\large\scshape #1\par}\nopagebreak\medskip}
+\newcommand{\subheading}[1]{\par\needspace{5\baselineskip}\medskip{\centering\itshape #1\par}\nopagebreak\smallskip}
 \newenvironment{lines}[1][1.5em]{\par\begingroup\setlength{\parindent}{0pt}\setlength{\leftskip}{#1}\raggedright}{\par\endgroup}
 \newenvironment{stanza}{\par\begingroup\setlength{\parindent}{0pt}\setlength{\leftskip}{1.5em}\raggedright}{\par\endgroup\smallskip}
 \newenvironment{notepara}[1]{\par\noindent\textbf{#1.}\ \itshape\ignorespaces}{\par}
