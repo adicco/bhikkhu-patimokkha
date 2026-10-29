@@ -257,7 +257,7 @@ async function verifyTurnstile(token: unknown, ip: string) {
   if (typeof token !== "string" || !token || token.length > 2048) {
     throw new HttpError(403, "The check that you’re not a robot didn’t finish. Try again.");
   }
-  let outcome: { success?: boolean; action?: string; "error-codes"?: string[] };
+  let outcome: { success?: boolean; action?: string; metadata?: { result_with_testing_key?: boolean } };
   try {
     const res = await fetch(TURNSTILE_VERIFY, {
       method: "POST",
@@ -269,7 +269,9 @@ async function verifyTurnstile(token: unknown, ip: string) {
     console.error("turnstile: siteverify failed:", e);
     throw new HttpError(503, "The robot check couldn’t be confirmed just now. Try again in a minute.");
   }
-  if (!outcome.success || outcome.action !== "build") {
+  // Cloudflare's test keys (1x00…AA) pass without echoing the widget's action.
+  const testing = outcome.metadata?.result_with_testing_key === true;
+  if (!outcome.success || (outcome.action !== "build" && !testing)) {
     throw new HttpError(403, "The check that you’re not a robot failed. Reload the page and try again.");
   }
 }

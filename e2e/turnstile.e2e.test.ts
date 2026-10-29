@@ -11,7 +11,8 @@ import { buildFromForm, change, launch, open, startSite, type Site } from "./har
 const SITE_KEY = "test-site-key";
 const SECRET = "test-secret";
 
-/** Siteverify: "good-token" passes for the "build" action; "other-action" passes for another. */
+/** Siteverify: "good-token" passes for the "build" action; "other-action" passes for another;
+ * "test-key" passes as Cloudflare's test keys do, with no action. */
 const verified: URLSearchParams[] = [];
 const verify = Bun.serve({
   port: 0,
@@ -19,9 +20,10 @@ const verify = Bun.serve({
   async fetch(r) {
     const form = new URLSearchParams(await r.text());
     verified.push(form);
-    const ok = form.get("secret") === SECRET && ["good-token", "other-action"].includes(form.get("response")!);
+    const token = form.get("response")!;
+    const ok = form.get("secret") === SECRET && ["good-token", "other-action", "test-key"].includes(token);
     return Response.json(ok
-      ? { success: true, action: form.get("response") === "good-token" ? "build" : "other" }
+      ? token === "test-key" ? { success: true, metadata: { result_with_testing_key: true } } : { success: true, action: token === "good-token" ? "build" : "other" }
       : { success: false, "error-codes": ["invalid-input-response"] });
   },
 });
@@ -87,6 +89,10 @@ describe("the API", () => {
     expect(verified).toHaveLength(1);
     expect(verified[0]!.get("secret")).toBe(SECRET);
     expect(verified[0]!.get("remoteip")).toBe("127.0.0.1");
+  }, 120_000);
+
+  test("Cloudflare's test keys pass without an action", async () => {
+    expect((await build({ ...valid, turnstile: "test-key" })).status).toBe(200);
   }, 120_000);
 });
 
