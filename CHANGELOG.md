@@ -6,6 +6,8 @@ tag. Left empty, the notes list the commit messages since the last release.
 
 ## Unreleased
 
+## v2026.10.29.1 (29 October 2026)
+
 **PDF page breaks**: A section heading (Pārājika, Saṅghādisesa, …) no longer sits at the foot of a page with only a line or two under it; if there isn't room for the heading and a few lines of its text, it starts on the next page. A rule of three lines or fewer is no longer split across two pages, and no page now begins or ends with a single stray line of a paragraph. This works the same in A4, A5 and the booklet, since it is worked out page by page as the PDF is made. Some pages end a few lines short as a result.
 
 ## v2026.10.13.1 (13 October 2026)
