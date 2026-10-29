@@ -7,6 +7,7 @@ services:
       args:
         SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH:-}
         GIT_COMMIT: ${GIT_COMMIT:-}
+        BUN_VERSION:   # from the environment if set (BUN_VERSION=1.4.4 scripts/deploy.sh), else the Dockerfile's
     image: patimokkha
     restart: unless-stopped
     ports:
