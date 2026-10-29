@@ -94,8 +94,13 @@ fitting the glosses into the sentence, all in `src/occasion.ts`:
   pavāraṇā)", lower-cased as in the notes.
 - Note 6: the English count is the note's numeral ("12 bhikkhus"); four stays "four".
 - Address: "Venerable sirs [friends]" becomes "Friends" when the senior bhikkhu gives the motion.
-- Not glossed, so left as printed: note 5's counts ("seven Uposathas remain"), the Pavāraṇā's
-  "with three statements", and "fifteenth [fourteenth]" on a harmony Pavāraṇā.
+- Note 5 (counts): not glossed in the book, so rendered clause by clause on the pattern of the
+  passage's own English ("This number (of Uposathas) is past; this number remains") and its
+  printed "seven Uposathas remain": *atikkanta* "has/have passed", *avasiṭṭha* "remain(s)",
+  *paripuṇṇa* "is/are complete"; "Uposatha" and "Pavāraṇā" capitalised as in the lines above,
+  clauses joined with ";" as printed (`remainingEnglish` in `src/occasion.ts`).
+- Not glossed, so left as printed: the Pavāraṇā's "with three statements", and
+  "fifteenth [fourteenth]" on a harmony Pavāraṇā.
 
 ## Not covered as thoroughly
 

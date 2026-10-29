@@ -84,10 +84,20 @@ describe("occasion", () => {
     expect(text).toContain("Ajja pavāraṇā sāmaggī. Yadi saṅghassa pattakallaṁ, saṅgho dve-vācikaṁ pavāreyya.");
   });
 
+  test("note 5's counts are put into English", () => {
+    let text = md({ season: "gimha", fortnight: 4 }, ["pubba-kicca"], "english");
+    expect(text).toContain("one Uposatha has arrived;\\\n*three Uposathas* have passed;\\\n*four Uposathas* remain.");
+    text = md({ season: "vassana", fortnight: 8 }, ["pubba-kicca"], "english");
+    expect(text).toContain("*six Uposathas and one Pavāraṇā* have passed;\\\n*seven Uposathas and one Pavāraṇā* are complete.");
+    text = md({ season: "hemanta", fortnight: 7 }, ["pubba-kicca"], "english");
+    expect(text).toContain("*six Uposathas* have passed;\\\n*one Uposatha* remains.");
+  });
+
   test("English the book doesn't give is left as printed and marked", () => {
     const show = showFor("both");
-    const html = toHtml(render(chapters, show, { season: "gimha", fortnight: 4 }, ["pubba-kicca"]), show, { title: "t" });
-    expect(html).toMatch(/<span class="slot unglossed" data-slot="remaining" data-set="">.*seven.* Uposathas remain<\/span>/);
+    const html = toHtml(render(chapters, show, { season: "vassana", statements: "two" }, ["pavarana"]), show, { title: "t" });
+    expect(html).toMatch(/<span class="slot unglossed" data-slot="statements" data-set="">with three statements<\/span>/);
+    expect(html).not.toContain('data-slot="remaining"');
     expect(html).not.toContain("undefined\"");
   });
 

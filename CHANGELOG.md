@@ -2,7 +2,13 @@
 
 What changed in each release of the PDFs, EPUBs, HTML and Markdown. Add to **Unreleased** as
 you go; `bun run publish` uses it as the release notes and then files it under the release's
-tag. Left empty, the notes list the commit messages since the last release.
+tag. Left empty, the notes list the commit messages since the last release. Changes that only
+affect the website (the occasion picker and the PDFs it builds on demand) go under **Website**
+instead: they reach readers when the site is redeployed, not in a release.
+
+## Website
+
+**30 October 2026 — Season-telling in English**: When the site builds the text for a particular uposatha, the English now gives that uposatha's count ("two Uposathas have passed; five Uposathas remain") instead of the book's "seven Uposathas remain", which is only right for the first uposatha of the cold season. The book gives no English for these counts, so they follow the wording of the passage itself. The released PDFs, EPUBs and Markdown print the book's own reading and are unchanged.
 
 ## Unreleased
 

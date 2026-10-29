@@ -116,6 +116,32 @@ export interface Reading { source?: string; changed: boolean }
 
 const as = (source: string | undefined, changed: boolean): Reading => ({ source: changed ? source : undefined, changed });
 
+const COUNTS: Record<string, string> = {
+  eko: "one", dve: "two", tayo: "three", cattāro: "four", pañca: "five",
+  cha: "six", satta: "seven", aṭṭha: "eight", nava: "nine", dasa: "ten",
+};
+const VERBS: Record<string, [string, string]> = { // [singular, plural]
+  atikkant: ["has passed", "have passed"],
+  avasiṭṭh: ["remains", "remain"],
+  paripuṇṇ: ["is complete", "are complete"],
+};
+
+/**
+ * Note 5's counts in English. The book glosses none of them, so each clause is rendered on the
+ * pattern of the passage's own "This number (of Uposathas) is past; this number remains" and its
+ * printed "seven Uposathas remain" (audit/README.md).
+ */
+export function remainingEnglish(entry: string): string {
+  return entry.split(", ").map((clause) => {
+    const m = clause.match(/^(\S+) (ca )?uposath[āo] (ekā ca pavāraṇā )?(atikkant|avasiṭṭh|paripuṇṇ)[āo]$/);
+    const count = m && COUNTS[m[1]!];
+    if (!m || !count) throw new Error(`note 5: cannot translate "${clause}"`);
+    const plural = count !== "one" || !!m[3];
+    const what = `${count} Uposatha${count === "one" ? "" : "s"}${m[3] ? " and one Pavāraṇā" : ""}`;
+    return `{% var %}${what}{% /var %} ${VERBS[m[4]!]![plural ? 1 : 0]}`;
+  }).join(";\\\n");
+}
+
 /** Readings from the notes, by slot name. Attribute-driven slots (day, address…) are handled in the schema. */
 export function reading(name: string, lang: Lang, o: Occasion): Reading {
   const pi = lang === "pi";
@@ -152,7 +178,8 @@ export function reading(name: string, lang: Lang, o: Occasion): Reading {
       const t = tableFor(o);
       const entry = t.entries[n - 1];
       const changed = t !== SEASON_TABLES[0] || n !== 1;
-      if (!pi || !entry) return { changed };
+      if (!entry) return { changed };
+      if (!pi) return as(remainingEnglish(entry), changed);
       return as(`{% var note="5" %}${entry.replace(/, /g, ",\\\n")}{% /var %}`, changed);
     }
 

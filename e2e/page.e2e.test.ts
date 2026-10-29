@@ -221,15 +221,15 @@ describe("the preview", () => {
     expect(text).toContain("Ayaṁ gimhotu. Asmiñ-ca utumhi aṭṭha uposathā.");
     expect(text).toContain("eko uposatho sampatto,\ndve uposathā atikkantā,\npañca uposathā avasiṭṭhā.");
     expect(text).toContain("This is the summer");
-    // The book gives no English for note 5's counts: the printed English stays, marked.
-    expect(text).toContain("seven Uposathas remain.");
-    expect(await page.isVisible("#unglossed-key")).toBe(true);
-    expect(await page.locator('#preview .unglossed[data-slot="remaining"]').count()).toBe(1);
+    // The book gives no English for note 5's counts: they are rendered on the passage's pattern.
+    expect(text).toContain("one Uposatha has arrived;\ntwo Uposathas have passed;\nfive Uposathas remain.");
+    expect(await page.isHidden("#unglossed-key")).toBe(true);
 
     await change(page, () => page.check(radio("season", "vassana")));
     text = await previewText(page);
     expect(text).toContain("Ayaṁ vassānotu. Asmiñ-ca utumhi satta ca uposathā ekā ca pavāraṇā."); // the book's "sattā", corrected
     expect(text).toContain("dve uposathā atikkantā,\ncattāro ca uposathā ekā ca pavāraṇā avasiṭṭhā.");
+    expect(text).toContain("two Uposathas have passed;\nfour Uposathas and one Pavāraṇā remain.");
     expect(text).toContain("there are seven uposathas and one pavāraṇā");
 
     await change(page, () => page.check('input[name="adhika"]'));
