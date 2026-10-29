@@ -4,3 +4,4 @@ dist
 audit
 test
 *.log
+.env

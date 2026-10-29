@@ -296,6 +296,49 @@
     later();
   });
 
+  // ---- Turnstile: when the server asks for it, a Cloudflare widget that runs when the button is
+  // pressed and only shows itself if it needs the reader to do something. Each token is good once.
+  let turnstileKey;
+  let widget;
+  let pending;
+  const challenge = $("#turnstile");
+  function loadTurnstile(sitekey) {
+    turnstileKey = sitekey;
+    return new Promise((resolve, reject) => {
+      window.onTurnstileLoad = resolve;
+      const s = Object.assign(document.createElement("script"), {
+        src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad",
+        async: true,
+      });
+      s.onerror = reject;
+      document.head.append(s);
+    }).then(() => {
+      const settle = (fn) => (arg) => { challenge.hidden = true; const p = pending; pending = undefined; p?.[fn](arg); };
+      widget = turnstile.render(challenge, {
+        sitekey,
+        action: "build",
+        execution: "execute",
+        appearance: "interaction-only",
+        theme: document.documentElement.dataset.theme ?? "auto",
+        "before-interactive-callback": () => {
+          challenge.hidden = false;
+          status.textContent = "Confirm you’re not a robot to start the build.";
+        },
+        callback: settle("resolve"),
+        "error-callback": (code) => { settle("reject")(new Error(`the check that you’re not a robot failed (${code}). Try again.`)); return true; },
+        "timeout-callback": () => settle("reject")(new Error("the check that you’re not a robot timed out. Try again.")),
+      });
+    });
+  }
+  function turnstileToken() {
+    if (!turnstileKey) return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      pending = { resolve, reject };
+      turnstile.reset(widget);
+      turnstile.execute(widget);
+    });
+  }
+
   // ---- Build.
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -308,8 +351,11 @@
     }
     button.disabled = true;
     status.className = "";
-    status.textContent = body.target === "pdf" ? "Building… typesetting takes about ten seconds." : "Building…";
+    const building = body.target === "pdf" ? "Building… typesetting takes about ten seconds." : "Building…";
+    status.textContent = building;
     try {
+      body.turnstile = await turnstileToken();
+      status.textContent = building;
       const res = await fetch("api/build", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error((await res.json().catch(() => null))?.error ?? `The server answered ${res.status}.`);
       const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "bhikkhu-patimokkha";
@@ -339,11 +385,21 @@
   lastCeremony = value("ceremony");
   sync();
 
-  fetch("api/health").then((r) => {
+  fetch("api/health").then(async (r) => {
     if (!r.ok) throw new Error();
-    online = true;
-    button.disabled = false;
+    const { turnstile: sitekey } = await r.json();
     refresh();
+    if (sitekey) {
+      try {
+        await loadTurnstile(sitekey);
+      } catch {
+        status.textContent = "Custom builds need Cloudflare’s robot check, which didn’t load (is something blocking challenges.cloudflare.com?). The downloads above still work.";
+        button.disabled = true;
+        return;
+      }
+    }
+    online = true;
+    button.disabled = status.className === "error";
   }).catch(() => {
     button.disabled = true;
     status.textContent = "Custom builds need the site’s server, which isn’t answering. The downloads above still work.";

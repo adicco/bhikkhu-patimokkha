@@ -16,6 +16,9 @@ services:
       BUILD_QUEUE: "8"
       BUILD_TIMEOUT: "180"
       CLIENT_IP_HEADER: cf-connecting-ip   # only reachable through the tunnel (and 127.0.0.1)
+      # Cloudflare Turnstile on custom builds: put both keys in .env beside this file (unset = off).
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     volumes:
       - build-cache:/app/dist/cache
     networks:

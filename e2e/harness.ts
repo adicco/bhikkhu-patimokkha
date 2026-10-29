@@ -27,7 +27,8 @@ export interface Site {
   stop(): Promise<void>;
 }
 
-export async function startSite(): Promise<Site> {
+/** `env` adds to the server's environment (e.g. Turnstile keys). */
+export async function startSite(env: Record<string, string> = {}): Promise<Site> {
   const dir = mkdtempSync(join(tmpdir(), "patimokkha-e2e-"));
   const site = join(dir, "site");
   mkdirSync(join(site, "files"), { recursive: true });
@@ -48,7 +49,7 @@ export async function startSite(): Promise<Site> {
 
   const server = Bun.spawn(["bun", "src/serve.ts"], {
     cwd: ROOT,
-    env: { ...process.env, PORT: "0", HOST: "127.0.0.1", SITE_DIR: site, CACHE_DIR: join(dir, "cache"), BUILD_CONCURRENCY: "2" },
+    env: { ...process.env, PORT: "0", HOST: "127.0.0.1", SITE_DIR: site, CACHE_DIR: join(dir, "cache"), BUILD_CONCURRENCY: "2", ...env },
     stdout: "pipe",
     stderr: "inherit",
   });
@@ -81,7 +82,7 @@ export const launch = (): Promise<Browser> =>
 export interface Opened { page: Page; errors: string[]; close(): Promise<void> }
 
 /** Open the page with the clock fixed at `date` and wait until the server has answered. */
-export async function open(browser: Browser, site: Site, opts: { date?: string; width?: number; offline?: boolean } = {}): Promise<Opened> {
+export async function open(browser: Browser, site: Site, opts: { date?: string; width?: number; offline?: boolean; setup?: (page: Page) => Promise<unknown> } = {}): Promise<Opened> {
   const context = await browser.newContext({ viewport: { width: opts.width ?? 1440, height: 1000 }, acceptDownloads: true });
   const page = await context.newPage();
   const errors: string[] = [];
@@ -89,6 +90,7 @@ export async function open(browser: Browser, site: Site, opts: { date?: string; 
   page.on("console", (m) => { if (m.type() === "error" && !opts.offline) errors.push(m.text()); });
   await page.clock.setFixedTime(new Date(`${opts.date ?? TODAY}T09:00:00`));
   if (opts.offline) await page.route("**/api/**", (r) => r.abort());
+  await opts.setup?.(page);
   const ready = opts.offline ? Promise.resolve() : page.waitForResponse((r) => r.url().endsWith("/api/preview"));
   await page.goto(site.url);
   await ready;

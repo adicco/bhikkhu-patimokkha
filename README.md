@@ -115,6 +115,8 @@ date (12 October 2026; the browser clock is pinned to match) and drive it in hea
   the preview's text for every option (expected Pāli typed from the book's notes), its
   highlighting, layout and type size; chapter presets, "build alone" and Reset; the command
   line; the page without its server; a phone-width layout; the API's validation.
+- `e2e/turnstile.e2e.test.ts`: builds refused without a token Cloudflare accepts, and the form
+  fetching one (both Cloudflare ends stood in for locally).
 - `e2e/builds.e2e.test.ts`: real builds from the form (A5, A4 in columns, a Pāli booklet in
   sections, type sizes, EPUB, HTML with and without instructions, zipped Markdown, English
   only), each downloaded and opened with pdftotext/pdfinfo/unzip; and the build cache.
@@ -135,6 +137,20 @@ git pull && scripts/deploy.sh      # docker compose build + up -d, with SOURCE_D
 `compose.yaml` listens on `127.0.0.1:3000`; put a TLS proxy in front (e.g. Caddy:
 `patimokkha.example.org { reverse_proxy 127.0.0.1:3000 }`). Custom builds are cached in the
 `build-cache` volume. `BUILD_CONCURRENCY` (default 1) sets how many LaTeX runs share the CPU.
+
+Custom builds can be guarded with [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/):
+create a widget for the site's hostname in the Cloudflare dashboard and put its keys in `.env`
+beside `compose.yaml` (git-ignored):
+
+```sh
+TURNSTILE_SITE_KEY=0x4AAAAAAA…
+TURNSTILE_SECRET_KEY=0x4AAAAAAA…
+```
+
+The page gets the site key from `/api/health`, so the keys can change without a new release. The
+widget runs when *Build* is pressed and only shows itself when Cloudflare wants the reader to
+do something; the server checks each token with Cloudflare (action `build`) before building or
+serving a cached build, and refuses the build (403) without one. Previews aren't guarded.
 
 ## Content
 

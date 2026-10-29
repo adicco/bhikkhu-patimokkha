@@ -15,6 +15,10 @@
  * (10; 0 turns the limit off) new builds start per BUILD_RATE_WINDOW (600 s). Cached builds don't count.
  * Behind a proxy, CLIENT_IP_HEADER names the header with the client's address (cf-connecting-ip
  * behind a Cloudflare tunnel); only set it when the proxy is the only way in, since clients can forge it.
+ *
+ * With TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY set, every build must carry a Cloudflare Turnstile
+ * token (the form gets one when the button is pressed); /api/health gives the page the site key.
+ * TURNSTILE_VERIFY_URL overrides Cloudflare's siteverify endpoint (for the tests).
  */
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
@@ -35,6 +39,10 @@ const PER_IP = Number(process.env.BUILD_PER_IP ?? 2);
 const RATE_LIMIT = Number(process.env.BUILD_RATE_LIMIT ?? 10);
 const RATE_WINDOW = Number(process.env.BUILD_RATE_WINDOW ?? 600) * 1000;
 const IP_HEADER = process.env.CLIENT_IP_HEADER?.toLowerCase();
+const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || undefined;
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || undefined;
+const TURNSTILE_VERIFY = process.env.TURNSTILE_VERIFY_URL ?? "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+if (!TURNSTILE_SITE_KEY !== !TURNSTILE_SECRET) throw new Error("set both TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY, or neither");
 
 const SLUGS = loadChapters().map((c) => c.slug);
 
@@ -242,6 +250,30 @@ function prune() {
   for (const { d } of entries.slice(CACHE_ENTRIES)) rmSync(join(CACHE, d), { recursive: true, force: true });
 }
 
+// ---- Turnstile: a token from the form's widget, checked once with Cloudflare.
+
+async function verifyTurnstile(token: unknown, ip: string) {
+  if (!TURNSTILE_SECRET) return;
+  if (typeof token !== "string" || !token || token.length > 2048) {
+    throw new HttpError(403, "The check that you’re not a robot didn’t finish. Try again.");
+  }
+  let outcome: { success?: boolean; action?: string; "error-codes"?: string[] };
+  try {
+    const res = await fetch(TURNSTILE_VERIFY, {
+      method: "POST",
+      body: new URLSearchParams({ secret: TURNSTILE_SECRET, response: token, ...(ip !== "unknown" && { remoteip: ip }) }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    outcome = await res.json();
+  } catch (e) {
+    console.error("turnstile: siteverify failed:", e);
+    throw new HttpError(503, "The robot check couldn’t be confirmed just now. Try again in a minute.");
+  }
+  if (!outcome.success || outcome.action !== "build") {
+    throw new HttpError(403, "The check that you’re not a robot failed. Reload the page and try again.");
+  }
+}
+
 // ---- HTTP.
 
 const TYPES: Record<string, string> = {
@@ -282,7 +314,7 @@ const server = Bun.serve({
   async fetch(r, server) {
     const { pathname } = new URL(r.url);
     try {
-      if (pathname === "/api/health") return json({ ok: true, version: VERSION, running, waiting: waiting.length });
+      if (pathname === "/api/health") return json({ ok: true, version: VERSION, running, waiting: waiting.length, turnstile: TURNSTILE_SITE_KEY });
 
       if (pathname === "/api/preview" && r.method === "POST") {
         const { req, args, errors } = parse(await readBody(r));
@@ -292,9 +324,11 @@ const server = Bun.serve({
       }
 
       if (pathname === "/api/build" && r.method === "POST") {
-        const { req, args, errors } = parse(await readBody(r));
+        const body = await readBody(r);
+        const { req, args, errors } = parse(body);
         if (errors.length || !req) return json({ error: errors.join("; ") }, 400);
         const ip = (IP_HEADER && r.headers.get(IP_HEADER)?.split(",")[0]?.trim()) || server.requestIP(r)?.address || "unknown";
+        await verifyTurnstile(body.turnstile, ip);
         const path = await build(req, args, ip);
         const name = path.split(sep).pop()!;
         return new Response(Bun.file(path), {

@@ -151,6 +151,7 @@ button {
 button:hover { background: var(--dye-press); }
 button:disabled { background: var(--stylus); cursor: progress; }
 #status { margin: 0; font-size: 0.95rem; }
+#turnstile { margin-top: 0.6rem; }
 #status.error { color: var(--fault); }
 .cli { margin-top: 1.4rem; font-size: 0.9rem; color: var(--stylus); }
 .cli summary { cursor: pointer; }
