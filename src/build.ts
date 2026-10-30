@@ -228,7 +228,8 @@ if (targets.has("epub")) {
     // ascii_identifiers covers the ids pandoc still makes itself (the title chapter's section).
     "pandoc", `.${base}.epub.html`, "-f", "html", "-t", "epub3+ascii_identifiers", "-o", `${base}.epub`,
     "--css", css, "--split-level=2", "--toc", "--toc-depth=2",
-    "--metadata-file", epubMeta,
+    // pandoc runs in outDir, so the file goes by its own name (outDir may be relative).
+    "--metadata-file", `.${base}.epub.yaml`,
     ...gentiumFiles().map((f) => `--epub-embed-font=${f}`),
   ]);
   rmSync(epubHtml);
