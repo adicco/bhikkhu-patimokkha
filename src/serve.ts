@@ -68,7 +68,7 @@ interface BuildRequest {
   occasion: Occasion;
   lang: Lang;
   target: "pdf" | "epub" | "html" | "md";
-  paper: "a4" | "a5" | "booklet";
+  paper: "a4" | "a5" | "booklet" | "a6-booklet";
   size: number;
   columns: boolean;
   signature?: number;
@@ -117,7 +117,7 @@ function parse(body: any): { req?: BuildRequest; args: string[]; errors: string[
     occasion,
     lang: oneOf(body.lang, ["both", "pali", "english"] as const, "lang", errors) ?? "both",
     target: oneOf(body.target, ["pdf", "epub", "html", "md"] as const, "target", errors) ?? "pdf",
-    paper: oneOf(body.paper, ["a4", "a5", "booklet"] as const, "paper", errors) ?? "a5",
+    paper: oneOf(body.paper, ["a4", "a5", "booklet", "a6-booklet"] as const, "paper", errors) ?? "a5",
     size: int(body.size, 8, 28, "size", errors) ?? 13,
     columns: body.columns === true,
     signature: int(body.signature, 4, 64, "signature", errors),
@@ -131,7 +131,7 @@ function parse(body: any): { req?: BuildRequest; args: string[]; errors: string[
   const args = [req.target, "--lang", req.lang];
   if (req.target === "pdf") {
     args.push("--paper", req.paper, "--size", String(req.size));
-    if (req.columns && req.lang === "both" && req.paper !== "booklet") args.push("--columns");
+    if (req.columns && req.lang === "both" && (req.paper === "a4" || req.paper === "a5")) args.push("--columns");
     if (req.signature && req.paper === "booklet") args.push("--signature", String(req.signature));
   }
   if (req.chapters.length !== SLUGS.length) args.push("--chapters", req.chapters.join(","));

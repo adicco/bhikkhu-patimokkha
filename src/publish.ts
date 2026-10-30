@@ -165,6 +165,7 @@ ${LANGS.map((l) => `| **${l.label}** | ${FORMATS.map((f) => {
 }).join(" | ")} |`).join("\n")}
 
 The A5 booklet is imposed two-up on A4 landscape: print double-sided, flip on the short edge, fold and staple.
+The A6 booklet is imposed four-up on A4; its first sheet shows how to print it (double-sided, flip on the long edge), cut it, stack it, fold it and staple it.
 SHA-256 digests are in \`manifest.json\`.
 `;
 

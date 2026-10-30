@@ -14,7 +14,7 @@ export function esc(s: string): string {
 
 export interface LatexOptions {
   title: string;
-  paper: "a4" | "a5";
+  paper: "a4" | "a5" | "a6";
   fontSize: number;
   /**
    * How bilingual passages are set:
@@ -165,9 +165,13 @@ export function toLatex(chapters: Rendered[], show: Show, opts: LatexOptions): s
     return `% ---- ${chapter.file}\n${brk}\n\\phantomsection\\addcontentsline{toc}{section}{${esc(chapter.title)}}\n${content}`;
   }).join("\n\n") + (open ? "\n\\end{paracol}" : "");
 
-  const geometry = opts.paper === "a5"
-    ? "a5paper,inner=18mm,outer=14mm,top=16mm,bottom=18mm"
-    : "a4paper,inner=25mm,outer=20mm,top=20mm,bottom=22mm";
+  // A6 pages are printed four to an A4 sheet and cut apart, so their top, bottom and outer edges
+  // lie on the sheet's edges: the margins stay clear of what a printer can't print (about 5mm).
+  const geometry = {
+    a4: "a4paper,inner=25mm,outer=20mm,top=20mm,bottom=22mm",
+    a5: "a5paper,inner=18mm,outer=14mm,top=16mm,bottom=18mm",
+    a6: "a6paper,inner=11mm,outer=9mm,top=10mm,bottom=14mm,footskip=7mm",
+  }[opts.paper];
 
   // article itself only knows 10, 11 and 12pt and silently falls back to 10pt for anything else;
   // other sizes go through the fontsize package, which scales \small, \large etc. to match.

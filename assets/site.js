@@ -40,7 +40,7 @@
 
   const ORDINAL = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
   const FORMAT_LABEL = { pdf: "PDF", epub: "EPUB", html: "HTML", md: "Markdown" };
-  const PAPER_LABEL = { a4: "A4 PDF", a5: "A5 PDF", booklet: "A5 booklet" };
+  const PAPER_LABEL = { a4: "A4 PDF", a5: "A5 PDF", booklet: "A5 booklet", "a6-booklet": "A6 booklet" };
 
   // ---- Dates: upcoming uposathas from the embedded calendar.
   const dateSelect = $("#date");
@@ -157,7 +157,8 @@
     const pdf = value("target") === "pdf";
     for (const el of $$("[data-pdf]")) el.hidden = !pdf;
     for (const el of $$("[data-booklet]")) el.hidden = value("paper") !== "booklet";
-    for (const el of $$("[data-columns]")) el.hidden = !pdf || value("lang") !== "both" || value("paper") === "booklet";
+    const booklet = value("paper") === "booklet" || value("paper") === "a6-booklet";
+    for (const el of $$("[data-columns]")) el.hidden = !pdf || value("lang") !== "both" || booklet;
     for (const el of $$("[data-english]")) el.hidden = value("lang") === "pali";
     if (value("day") === "harmony" && ceremony !== "pavarana") set("day", "fifteenth");
     const what = pdf ? PAPER_LABEL[value("paper")] : FORMAT_LABEL[value("target")];
@@ -165,10 +166,10 @@
     syncReset();
 
     // The preview follows the PDF's layout and type size: English under the Pāli (smaller, grey),
-    // beside it (smaller), on the facing page of the booklet, or alone at full size.
+    // beside it (smaller), on the facing page of a booklet, or alone at full size.
     const lang = value("lang");
     const layout = lang !== "both" ? "single" : !pdf ? "stacked"
-      : value("paper") === "booklet" ? "facing" : value("columns") ? "columns" : "stacked";
+      : booklet ? "facing" : value("columns") ? "columns" : "stacked";
     const p = $("#preview");
     p.dataset.layout = layout;
     p.style.setProperty("--scale", pdf ? String(Number(value("size")) / 13) : "1");

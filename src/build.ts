@@ -15,6 +15,7 @@ import { occasionErrors, OCCASION_CHOICES, type Occasion } from "./occasion";
 import { toMarkdown } from "./writers/markdown";
 import { toHtml } from "./writers/html";
 import { toLatex } from "./writers/latex";
+import { a6Booklet, a6Sheets } from "./impose";
 
 const HELP = `
 Usage: bun run build [targets…] [options]
@@ -33,7 +34,8 @@ Output:
                                 or the book's own reading (default: corrections)
 
 PDF:
-  --paper a4,a5,booklet         paper sizes to make (default: all three)
+  --paper a4,a5,booklet,a6-booklet
+                                paper sizes to make (default: a4,a5,booklet)
   --size PT                     font size in points, e.g. 13 or 10.5 (default: 13)
   --columns                     bilingual A4/A5 side by side instead of stacked
   --signature N                 split the booklet into gatherings of N pages (multiple of 4)
@@ -102,7 +104,7 @@ for (const [k, choices] of Object.entries(OCCASION_CHOICES)) {
   const v = values[k as keyof typeof OCCASION_CHOICES];
   if (v !== undefined) oneOf(`--${k}`, v, choices);
 }
-const papers = new Set((values.paper ?? "a4,a5,booklet").split(",").map((p) => oneOf("--paper", p.trim().toLowerCase(), ["a4", "a5", "booklet"])));
+const papers = new Set((values.paper ?? "a4,a5,booklet").split(",").map((p) => oneOf("--paper", p.trim().toLowerCase(), ["a4", "a5", "booklet", "a6-booklet"])));
 const fontSize = values.size === undefined ? 13 : Number(values.size);
 if (!(fontSize >= 6 && fontSize <= 30)) fail(`--size must be a font size in points from 6 to 30, not '${values.size}'`);
 const sig = values.signature === undefined ? 0 : count("signature", values.signature);
@@ -238,15 +240,26 @@ if (targets.has("epub")) {
 }
 
 if (targets.has("pdf")) {
-  // A4, A5, and A5 pages imposed 2-up on A4 landscape for a folded booklet.
+  // A4, A5, A5 pages imposed 2-up on A4 landscape for a folded booklet, and A6 pages imposed
+  // 4-up on A4 for a booklet cut from it (src/impose.ts).
   // Bilingual A4/A5 put the English under the Pāli (or beside it with --columns); the booklet
   // follows the printed book: Pāli on the left page, English on the facing right page.
 
   const layout = values.columns ? "columns" : "stacked";
   const pali = paliWords(chapters);
-  async function typeset(paper: "a4" | "a5", layout: "stacked" | "columns" | "facing", name = `${base}.${paper}`) {
+  /** Pages in the PDF `name` was typeset to, from LaTeX's log. The log wraps long lines, possibly
+   *  inside the count, so they are joined first. */
+  function pagesIn(name: string) {
+    const n = Number(/Output written on .*?\((\d+) pages?/.exec(readFileSync(join(outDir, `${name}.log`), "utf8").replace(/\n/g, ""))?.[1]);
+    if (!n) throw new Error(`no page count in ${name}.log`);
+    return n;
+  }
+  /** Pages in the PDF last typeset. */
+  let pages = 0;
+  async function typeset(paper: "a4" | "a5" | "a6", layout: "stacked" | "columns" | "facing", name = `${base}.${paper}`) {
     writeFileSync(join(outDir, `${name}.tex`), toLatex(rendered, show, { title, paper, fontSize, layout, paliWords: pali }));
     for (let i = 0; i < 2; i++) await run(lualatex(name));
+    pages = pagesIn(name);
     for (const ext of ["aux", "log", "out", "toc"]) rmSync(join(outDir, `${name}.${ext}`), { force: true });
     return `${name}.pdf`;
   }
@@ -270,5 +283,16 @@ if (targets.has("pdf")) {
     for (const ext of ["aux", "log", "tex"]) rmSync(join(outDir, `${name}.${ext}`), { force: true });
     rmSync(join(outDir, a5));
     console.log(`pdf   ${join(outDir, `${name}.pdf`)}  (A4 landscape, print double-sided, flip on short edge)`);
+  }
+  if (papers.has("a6-booklet")) {
+    // A6 pages four to a side of A4, after a guide sheet: print double-sided (long edge), cut
+    // the stack in half, right-hand pile under the left, fold and staple.
+    const a6 = await typeset("a6", "facing", `${base}.a6-facing`);
+    const name = `${base}.a6-booklet`;
+    writeFileSync(join(outDir, `${name}.tex`), a6Booklet({ file: a6, pages, title }));
+    await run(lualatex(name));
+    for (const ext of ["aux", "log", "tex"]) rmSync(join(outDir, `${name}.${ext}`), { force: true });
+    rmSync(join(outDir, a6));
+    console.log(`pdf   ${join(outDir, `${name}.pdf`)}  (guide + ${a6Sheets(pages)} A4 sheets, print double-sided, flip on long edge)`);
   }
 }

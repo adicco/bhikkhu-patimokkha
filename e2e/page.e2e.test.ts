@@ -39,11 +39,11 @@ describe("downloads", () => {
     const rows = page.locator("table.downloads tbody tr");
     expect(await rows.count()).toBe(3);
     expect(await page.locator("table.downloads thead th").allTextContents())
-      .toEqual(["A4 PDF", "A5 PDF", "A5 booklet", "EPUB", "HTML", "Markdown"]);
+      .toEqual(["A4 PDF", "A5 PDF", "A5 booklet", "A6 booklet", "EPUB", "HTML", "Markdown"]);
     const hrefs = await page.$$eval("table.downloads a", (as) => as.map((a) => a.getAttribute("href")!));
     expect(hrefs.sort()).toEqual(site.manifest.files.map((f) => f.file).sort());
     for (const href of hrefs) {
-      expect(href).toMatch(/^files\/bhikkhu-patimokkha\.v\d+\.\d+\.(pali\.eng|pali\.only|eng\.only)\.((a4|a5|a5-booklet)\.[0-9a-f]{10}\.pdf|[0-9a-f]{10}\.(epub|html)|md\.[0-9a-f]{10}\.zip)$/);
+      expect(href).toMatch(/^files\/bhikkhu-patimokkha\.v\d+\.\d+\.(pali\.eng|pali\.only|eng\.only)\.((a4|a5|a5-booklet|a6-booklet)\.[0-9a-f]{10}\.pdf|[0-9a-f]{10}\.(epub|html)|md\.[0-9a-f]{10}\.zip)$/);
       const res = await page.request.get(site.url + href);
       expect(res.status()).toBe(200);
       expect(res.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
@@ -338,6 +338,8 @@ describe("the preview", () => {
 
     await change(page, () => page.check(radio("paper", "booklet")));
     expect(await look()).toMatchObject({ layout: "facing", english: 1, color: ink, beside: true });
+    await change(page, () => page.check(radio("paper", "a6-booklet")));
+    expect(await look()).toMatchObject({ layout: "facing", english: 1, color: ink, beside: true });
 
     // Not a PDF: no type size, English under the Pāli.
     await change(page, () => page.check(radio("target", "epub")));
@@ -430,6 +432,8 @@ describe("file options", () => {
     expect(await visible()).toEqual({ paper: true, columns: true, size: true, signature: false, instructions: true, button: "Build A5 PDF" });
     await change(page, () => page.check(radio("paper", "booklet")));
     expect(await visible()).toEqual({ paper: true, columns: false, size: true, signature: true, instructions: true, button: "Build A5 booklet" });
+    await change(page, () => page.check(radio("paper", "a6-booklet")));
+    expect(await visible()).toEqual({ paper: true, columns: false, size: true, signature: false, instructions: true, button: "Build A6 booklet" });
     await change(page, () => page.check(radio("paper", "a4")));
     expect((await visible()).button).toBe("Build A4 PDF");
     await change(page, () => page.check(radio("lang", "pali")));
@@ -470,7 +474,7 @@ describe("without the server", () => {
     expect(await page.textContent("#status")).toBe("Custom builds need the site’s server, which isn’t answering. The downloads above still work.");
     expect(await page.isDisabled("#build")).toBe(true);
     expect(await previewText(page)).toContain("Ajj’uposatho paṇṇaraso [cātuddaso].");
-    expect(await page.locator("table.downloads a").count()).toBe(18);
+    expect(await page.locator("table.downloads a").count()).toBe(21);
   }, { offline: true }));
 });
 

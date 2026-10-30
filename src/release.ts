@@ -2,7 +2,8 @@
 /**
  * bun run release [--skip-build] [--out dist/site] [--dist dist]   (--help for details)
  *
- * Builds every standard file (three languages × A4, A5, A5 booklet, EPUB, HTML, Markdown zip),
+ * Builds every standard file (three languages × A4, A5, A5 booklet, A6 booklet, EPUB, HTML,
+ * Markdown zip),
  * copies each into <out>/files/ under a name that carries the text's version (content/edition.json)
  * and the file's own content hash (bhikkhu-patimokkha.v1.0.pali.only.a4.3f9c2a1e0b.pdf,
  * …v1.0.pali.only.9d04b7c2e1.epub), writes <out>/manifest.json and generates
@@ -55,7 +56,7 @@ const env = { ...process.env, SOURCE_DATE_EPOCH: epoch, FORCE_SOURCE_DATE: "1" }
 if (!values["skip-build"]) {
   for (const { lang } of LANGS) {
     console.log(`\n== ${lang}`);
-    const p = Bun.spawn(["bun", "src/build.ts", "all", "--lang", lang, "--paper", "a4,a5,booklet", "--out", dist],
+    const p = Bun.spawn(["bun", "src/build.ts", "all", "--lang", lang, "--paper", "a4,a5,booklet,a6-booklet", "--out", dist],
       { cwd: ROOT, env, stdout: "inherit", stderr: "inherit" });
     if ((await p.exited) !== 0) process.exit(1);
   }

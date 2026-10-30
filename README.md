@@ -14,6 +14,7 @@ bun run build -- --lang english    # English only            → dist/english/
 bun run build:all                  # all three languages
 bun run build -- md pdf --lang pali --paper a4 --size 13
 bun run build -- pdf --paper booklet --signature 16
+bun run build -- pdf --paper a6-booklet --lang pali
 bun run build -- --help             # every option
 ```
 
@@ -29,6 +30,17 @@ The `pdf` target writes three files by default:
 | `….a5.pdf` | A5 pages |
 | `….a5-booklet.pdf` | A5 pages imposed two-up on A4 landscape in booklet order: print double-sided, **flip on short edge**, fold the stack in half and staple or sew at the fold |
 
+`--paper a6-booklet` adds a fourth, `….a6-booklet.pdf` (not made by default, but released and offered on the site): A6 pages four to a
+side of A4 landscape, turned a quarter-turn, for a booklet cut from the sheets. Its first sheet is a
+guide (blank on the back) with a picture of the first sheet: print double-sided, **flip on long
+edge**, cut the stack down the middle between the cut marks, put the right-hand pile under the
+left-hand one, fold at the fold marks and staple at the fold. Each sheet's front carries a small
+sheet number (`1/11`) by the top cut mark. Like the A5 booklet, it sets the Pāli and the English on
+facing pages. At 13pt the Pāli takes 11 sheets (88 pages), the English 13 and the bilingual text
+27, which is more than a stapler will go through; use `--chapters` or a smaller `--size` for a
+thinner booklet. The imposition is in `src/impose.ts`; `test/impose.test.ts` cuts, stacks and folds
+it and checks that the pages read in order.
+
 In bilingual builds, the A4 and A5 PDFs put each passage's English under its Pāli in a smaller,
 grey type; `--columns` sets them side by side instead. The booklet follows the printed book: Pāli
 on the left page, the English on the facing right page, the two kept level passage by passage.
@@ -39,7 +51,7 @@ on the left page, the English on the facing right page, the two kept level passa
 | `--notes` / `--no-notes` | on unless `pali` | the Preliminary Duties notes chapter |
 | `--instructions` / `--no-instructions` | on unless `pali` | English rubrics for group uposatha, pavāraṇā |
 | `--corrections` / `--no-corrections` | on | substitute suggested readings for the book's apparent typos (see `{% sic %}`); `--no-corrections` prints the book's own |
-| `--paper a4,a5,booklet` | all three | which PDFs to make (comma-separated) |
+| `--paper a4,a5,booklet,a6-booklet` | `a4,a5,booklet` | which PDFs to make (comma-separated) |
 | `--columns` | off | bilingual A4/A5: Pāli and English in parallel columns |
 | `--signature N` | one booklet | split the booklet into folded gatherings of N pages (a multiple of 4) for sewing |
 | `--size N` | 13pt | PDF font size; English beside or under the Pāli is 12/13 of it (12pt) |
@@ -118,8 +130,9 @@ date (12 October 2026; the browser clock is pinned to match) and drive it in hea
 - `e2e/turnstile.e2e.test.ts`: builds refused without a token Cloudflare accepts, and the form
   fetching one (both Cloudflare ends stood in for locally).
 - `e2e/builds.e2e.test.ts`: real builds from the form (A5, A4 in columns, a Pāli booklet in
-  sections, type sizes, EPUB, HTML with and without instructions, zipped Markdown, English
-  only), each downloaded and opened with pdftotext/pdfinfo/unzip; and the build cache.
+  sections, an A6 booklet and its guide sheet, type sizes, EPUB, HTML with and without
+  instructions, zipped Markdown, English only), each downloaded and opened with
+  pdftotext/pdfinfo/unzip; and the build cache.
 
 They need `playwright-core`'s headless Chromium (`bunx playwright-core install
 chromium-headless-shell`, or point `CHROMIUM_PATH` at a Chromium) and, for the builds,

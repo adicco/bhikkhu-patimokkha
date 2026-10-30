@@ -119,6 +119,21 @@ describe("PDF", () => {
     expect(text).not.toContain(squash("Before doing the Uposatha"));
   }));
 
+  test("an A6 booklet on A4, its guide sheet first", () => withPage(async (page) => {
+    await configure(page, [["#date", UPOSATHA], ["lang", "pali"], ["paper", "a6-booklet"], ["solo", "Pubba-kicca"]]);
+    const { name, path } = await buildFromForm(page);
+    expect(name).toMatch(/^bhikkhu-patimokkha\.v\d+\.\d+\.pali\.only\.custom\.a6-booklet\.[0-9a-f]{10}\.pdf$/);
+    const info = pdfInfo(path);
+    expect({ width: info.width, height: info.height }).toEqual({ width: A4.height, height: A4.width }); // A4 landscape
+    // The guide and its blank back, then both sides of each sheet.
+    expect(info.pages % 2).toBe(0);
+    const guide = squash(sh(["pdftotext", "-l", "1", path, "-"]));
+    expect(guide).toContain(squash("A6 booklet: how to make it up"));
+    expect(guide).toContain(squash("put the right-hand pile under the left-hand pile"));
+    expect(sh(["pdftotext", "-f", "2", "-l", "2", path, "-"]).trim()).toBe("");
+    expect(pdfText(path)).toContain(squash("eko uposatho sampatto"));
+  }));
+
   test("the type size changes the setting", () => withPage(async (page) => {
     await configure(page, [["#date", UPOSATHA], ["lang", "pali"], ["solo", "Pācittiya"], ['select[name="size"]', "10"]]);
     const small = pdfInfo((await buildFromForm(page)).path).pages;

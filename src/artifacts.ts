@@ -15,13 +15,14 @@ export const LANGS: { lang: Lang; label: string; tag: string }[] = [
   { lang: "english", label: "English", tag: "eng.only" },
 ];
 
-export type Kind = "a4" | "a5" | "booklet" | "epub" | "html" | "md";
+export type Kind = "a4" | "a5" | "booklet" | "a6-booklet" | "epub" | "html" | "md";
 
 /** `built` is the name of the file a build writes; releases add the hash to it (see releaseName). */
 export const FORMATS: { kind: Kind; label: string; target: "pdf" | "epub" | "html" | "md"; built: (base: string) => string }[] = [
   { kind: "a4", label: "A4 PDF", target: "pdf", built: (b) => `${b}.a4.pdf` },
   { kind: "a5", label: "A5 PDF", target: "pdf", built: (b) => `${b}.a5.pdf` },
   { kind: "booklet", label: "A5 booklet", target: "pdf", built: (b) => `${b}.a5-booklet.pdf` },
+  { kind: "a6-booklet", label: "A6 booklet", target: "pdf", built: (b) => `${b}.a6-booklet.pdf` },
   { kind: "epub", label: "EPUB", target: "epub", built: (b) => `${b}.epub` },
   { kind: "html", label: "HTML", target: "html", built: (b) => `${b}.html` },
   { kind: "md", label: "Markdown", target: "md", built: (b) => `${b}.md.zip` },
