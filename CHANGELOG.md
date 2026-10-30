@@ -12,6 +12,8 @@ instead: they reach readers when the site is redeployed, not in a release.
 
 ## Unreleased
 
+## v2026.10.30.1 (30 October 2026)
+
 **A6 booklet**: A new pocket-sized PDF, in all three languages, also offered for a single uposatha on the website. It is printed on A4: four A6 pages to each side of a sheet. The first sheet is a guide with a picture of the first sheet of pages. It explains how to print double-sided (flip on the long edge), cut the stack down the middle between the cut marks, put the right-hand pile under the left-hand one, then fold and staple. As in the A5 booklet, the Pāli and English are on facing pages. At 13pt the Pāli alone makes an 88-page booklet from 11 sheets of A4. The English takes 13 sheets and both languages together take 27, which is too thick to staple in one piece.
 
 ## v2026.10.29.1 (29 October 2026)
